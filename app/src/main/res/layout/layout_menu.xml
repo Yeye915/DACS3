@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#2E333D"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:padding="16.dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="itro"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/ivCloseMenu"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/close"
+            app:tint="#FFFFFF" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16.dp">
+
+        <TextView
+            android:id="@+id/menuTaiApp"
+            style="@style/MenuItemStyle"
+            android:text="TẢI APP" />
+
+        <View style="@style/DividerStyle" />
+
+        <TextView
+            android:id="@+id/menuBangGia"
+            style="@style/MenuItemStyle"
+            android:text="BẢNG GIÁ" />
+
+        <View style="@style/DividerStyle" />
+
+        <TextView
+            android:id="@+id/menuHuongDan"
+            style="@style/MenuItemStyle"
+            android:text="HƯỚNG DẪN" />
+
+        <View style="@style/DividerStyle" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="20.dp"
+            android:backgroundTint="#FFFFFF"
+            android:text="ĐĂNG KÝ"
+            android:textColor="#FF5722"
+            app:cornerRadius="4.dp" />
+    </LinearLayout>
+</LinearLayout>
