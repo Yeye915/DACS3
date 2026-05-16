@@ -10,17 +10,11 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Đăng nhập ITRO"
-        android:textSize="28sp"
-        android:textStyle="bold"
+        android:layout_marginBottom="32.dp"
+        android:text="Đăng nhập tài khoản"
         android:textColor="#1976D2"
-        android:layout_marginBottom="32.dp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Bạn là:"
-        android:textSize="16sp" />
+        android:textSize="28sp"
+        android:textStyle="bold" />
 
 
     <com.google.android.material.textfield.TextInputLayout

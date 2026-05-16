@@ -14,8 +14,8 @@ class FeatureAdapter(
     // Lớp ViewHolder kết nối với file item_feature.xml thông qua ViewBinding
     inner class FeatureViewHolder(private val binding: ItemFeatureBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(feature: Feature) {
-            binding.tvTitle.text = feature.title
-            binding.ivIcon.setImageResource(feature.iconResId)
+            binding.tvFeatureTitle.text = feature.title
+            binding.ivFeatureIcon.setImageResource(feature.iconResId)
 
             // Xử lý sự kiện click
             binding.root.setOnClickListener {

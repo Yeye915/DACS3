@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24.dp">
+        android:padding="24dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -18,48 +18,22 @@
             android:textSize="28sp"
             android:textStyle="bold"
             android:textColor="#1976D2"
-            android:layout_marginTop="32.dp"
-            android:layout_marginBottom="8.dp"/>
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="8dp"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Đăng ký để bắt đầu quản lý ngay"
-            android:layout_marginBottom="32.dp" />
+            android:layout_marginBottom="32dp"
+            android:text="Đăng kí ngay nhé !" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tôi là:"
-            android:textStyle="bold" />
-
-        <RadioGroup
-            android:id="@+id/rgRoleRegister"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="16.dp">
-            <RadioButton
-                android:id="@+id/rbLandlordReg"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Chủ trọ"
-                android:checked="true" />
-            <RadioButton
-                android:id="@+id/rbTenantReg"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Khách thuê" />
-        </RadioGroup>
-
+        <!-- Họ và tên -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Họ và tên"
-            android:layout_marginBottom="12.dp">
+            android:layout_marginBottom="12dp">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etFullName"
                 android:layout_width="match_parent"
@@ -67,12 +41,27 @@
                 android:inputType="textPersonName" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Ô nhập Email (Mới thêm) -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            android:layout_marginBottom="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Số điện thoại -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Số điện thoại"
-            android:layout_marginBottom="12.dp">
+            android:layout_marginBottom="12dp">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPhone"
                 android:layout_width="match_parent"
@@ -80,13 +69,14 @@
                 android:inputType="phone" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Mật khẩu -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Mật khẩu"
             app:passwordToggleEnabled="true"
-            android:layout_marginBottom="12.dp">
+            android:layout_marginBottom="12dp">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPassReg"
                 android:layout_width="match_parent"
@@ -94,13 +84,14 @@
                 android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Xác nhận mật khẩu -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Xác nhận mật khẩu"
             app:passwordToggleEnabled="true"
-            android:layout_marginBottom="24.dp">
+            android:layout_marginBottom="24dp">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etConfirmPass"
                 android:layout_width="match_parent"
@@ -114,17 +105,17 @@
             android:layout_height="56dp"
             android:text="ĐĂNG KÝ"
             android:backgroundTint="#1976D2"
-            app:cornerRadius="8.dp" />
+            app:cornerRadius="8dp" />
 
         <TextView
             android:id="@+id/tvBackToLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="24.dp"
+            android:layout_marginTop="24dp"
             android:text="Đã có tài khoản? Đăng nhập"
             android:textColor="#1976D2"
-            android:paddingBottom="32.dp"/>
+            android:paddingBottom="32dp"/>
 
     </LinearLayout>
 </ScrollView>
