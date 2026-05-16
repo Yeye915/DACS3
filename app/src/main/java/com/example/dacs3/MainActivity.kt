@@ -16,26 +16,25 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupRecyclerView()
-        setupTopNavigation() // Tách riêng phần xử lý menu trên cùng cho sạch code
-    }
-
-    private fun setupTopNavigation() {
-        // Fix lỗi: Gọi đúng ID của từng mục thay vì binding.root
-        binding.tvTopBlog.setOnClickListener {
-            Toast.makeText(this, "Mở trang Blog House", Toast.LENGTH_SHORT).show()
-        }
-
-        binding.tvTopLogin.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
-        }
-
         binding.tvTopRegister.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
         }
+
+        // 2. Xử lý khi bấm vào chữ "Đăng nhập"
+        binding.tvTopLogin.setOnClickListener {
+            // Lệnh này sẽ mở màn hình LoginActivity
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+        }
+
+        setupRecyclerView()
+
     }
+
+
+
+
 
     private fun setupRecyclerView() {
         // Chỉ giữ lại các tính năng quản lý cốt lõi trong Grid

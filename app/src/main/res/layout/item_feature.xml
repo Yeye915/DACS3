@@ -34,13 +34,6 @@
             android:textSize="13sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/tvFeatureDesc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Thêm, sửa, xóa"
-            android:textColor="@color/text_grey"
-            android:textSize="10sp" />
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

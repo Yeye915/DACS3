@@ -15,18 +15,13 @@
         android:paddingHorizontal="16dp"
         android:elevation="4dp">
 
-        <ImageView
-            android:layout_width="51dp"
-            android:layout_height="60dp"
-            android:src="@android:drawable/ic_menu_sort_by_size" />
-
         <TextView
             android:layout_width="113dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="House"
             android:textColor="@color/itro_green"
-            android:textSize="20sp"
+            android:textSize="24sp"
             android:textStyle="bold" />
 
         <View
@@ -60,44 +55,10 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/subHeader"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:layout_below="@id/topBar"
-        android:background="#363B46"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="16dp">
-
-        <TextView
-            android:id="@+id/tvTopBlog"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="?attr/selectableItemBackground"
-            android:gravity="center"
-            android:text="Blog"
-            android:textColor="#FFFFFF"
-            android:textSize="13sp" />
-
-        <View
-            android:layout_width="1dp"
-            android:layout_height="20dp"
-            android:background="#555A64" />
-
-        <View
-            android:layout_width="1dp"
-            android:layout_height="20dp"
-            android:background="#555A64" />
-
-    </LinearLayout>
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/bottomNav"
-        android:layout_below="@id/subHeader"
         android:fillViewport="true">
 
         <LinearLayout
@@ -116,13 +77,6 @@
                     android:layout_centerVertical="true"
                     android:orientation="vertical">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Tìm nhà khó - có House lo"
-                        android:textColor="@color/text_grey"
-                        android:textSize="14sp" />
                 </LinearLayout>
 
                 <TextView
@@ -148,15 +102,21 @@
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
-        android:layout_height="65dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="-2dp"
         android:background="#FFFFFF"
-        android:elevation="8dp"
+        app:elevation="8dp"
         app:itemIconSize="24dp"
         app:itemIconTint="@color/itro_green"
         app:itemTextColor="@color/itro_green"
-        app:labelVisibilityMode="labeled"
-        app:menu="@menu/bottom_nav_menu" />
+
+
+    app:labelVisibilityMode="labeled"
+
+
+    app:itemHorizontalTranslationEnabled="false"
+
+    app:menu="@menu/bottom_nav_menu" />
+
 
 </RelativeLayout>
