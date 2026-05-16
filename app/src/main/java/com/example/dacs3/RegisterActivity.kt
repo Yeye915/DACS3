@@ -1,40 +1,53 @@
 package com.example.dacs3
 
 import android.os.Bundle
+import android.util.Patterns
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.dacs3.databinding.ActivityRegisterBinding
+import com.google.firebase.auth.FirebaseAuth // 1. Import thư viện Firebase Auth
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterBinding
+    private lateinit var auth: FirebaseAuth // 2. Khai báo biến Firebase Auth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // 3. Khởi tạo đối tượng Firebase Auth
+        auth = FirebaseAuth.getInstance()
+
         binding.btnRegisterSubmit.setOnClickListener {
             performRegistration()
         }
 
         binding.tvBackToLogin.setOnClickListener {
-            finish() // Đóng màn hình đăng ký để quay về màn hình Login trước đó
+            finish()
         }
     }
 
     private fun performRegistration() {
         val name = binding.etFullName.text.toString().trim()
+        val email = binding.etEmail.text.toString().trim()
         val phone = binding.etPhone.text.toString().trim()
         val pass = binding.etPassReg.text.toString().trim()
         val confirmPass = binding.etConfirmPass.text.toString().trim()
-        val role = if (binding.rbLandlordReg.isChecked) "Chủ trọ" else "Khách thuê"
 
-        // Kiểm tra điều kiện
-        if (name.isEmpty() || phone.isEmpty() || pass.isEmpty() || confirmPass.isEmpty()) {
+        // Kiểm tra điều kiện bỏ trống
+        if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || pass.isEmpty() || confirmPass.isEmpty()) {
             Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show()
             return
         }
 
+        // Kiểm tra định dạng Email
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            binding.etEmail.error = "Email không đúng định dạng"
+            return
+        }
+
+        // Kiểm tra mật khẩu
         if (pass != confirmPass) {
             binding.etConfirmPass.error = "Mật khẩu xác nhận không khớp"
             return
@@ -45,11 +58,23 @@ class RegisterActivity : AppCompatActivity() {
             return
         }
 
-        // Nếu mọi thứ ok, thông báo thành công
-        val message = "Đăng ký thành công tài khoản $role: $name"
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        // --- 4. TIẾN HÀNH ĐĂNG KÝ VỚI FIREBASE ---
+        // Hiển thị thông báo đang xử lý để người dùng chờ
+        Toast.makeText(this, "Đang xử lý đăng ký...", Toast.LENGTH_SHORT).show()
 
-        // Sau khi đăng ký xong, thường sẽ chuyển về màn hình Login
-        finish()
+        auth.createUserWithEmailAndPassword(email, pass)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    // Đăng ký thành công hệ thống Auth của Firebase
+                    Toast.makeText(this, "Đăng ký thành công tài khoản: $name", Toast.LENGTH_LONG).show()
+
+                    // Sau khi đăng ký xong, quay về màn hình Login để người dùng đăng nhập lại
+                    finish()
+                } else {
+                    // Nếu thất bại (Ví dụ: Email đã tồn tại, không có mạng...)
+                    val errorMessage = task.exception?.message ?: "Lỗi không xác định"
+                    Toast.makeText(this, "Đăng ký thất bại: $errorMessage", Toast.LENGTH_LONG).show()
+                }
+            }
     }
 }

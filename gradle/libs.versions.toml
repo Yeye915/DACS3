@@ -1,7 +1,7 @@
 [versions]
 # Bộ 3 phiên bản ổn định nhất cho sinh viên năm 2
 agp = "8.7.3"
-kotlin = "1.9.22"
+kotlin = "2.3.0"
 googleServices = "4.4.2"
 
 # Androidx & UI
@@ -30,6 +30,7 @@ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -14,12 +14,12 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tạo tài khoản House"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:textColor="#1976D2"
             android:layout_marginTop="32dp"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="8dp"
+            android:text="Tạo tài khoản House"
+            android:textColor="@color/itro_green"
+            android:textSize="28sp"
+            android:textStyle="bold" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -103,8 +103,8 @@
             android:id="@+id/btnRegisterSubmit"
             android:layout_width="match_parent"
             android:layout_height="56dp"
+            android:backgroundTint="@color/itro_green"
             android:text="ĐĂNG KÝ"
-            android:backgroundTint="#1976D2"
             app:cornerRadius="8dp" />
 
         <TextView
@@ -113,9 +113,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="24dp"
+            android:paddingBottom="32dp"
             android:text="Đã có tài khoản? Đăng nhập"
-            android:textColor="#1976D2"
-            android:paddingBottom="32dp"/>
+            android:textColor="@color/itro_green" />
 
     </LinearLayout>
 </ScrollView>

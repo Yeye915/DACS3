@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="32.dp"
         android:text="Đăng nhập tài khoản"
-        android:textColor="#1976D2"
+        android:textColor="@color/itro_green"
         android:textSize="28sp"
         android:textStyle="bold" />
 
@@ -21,12 +21,16 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="12.dp"
         android:hint="Email hoặc Số điện thoại"
-        android:layout_marginBottom="12.dp">
+        android:textColorHint="@color/itro_green"
+        app:hintTextColor="@color/itro_green">
+
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etUsername"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textColorHint="@color/itro_green" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -47,8 +51,8 @@
         android:id="@+id/btnLogin"
         android:layout_width="match_parent"
         android:layout_height="56dp"
+        android:backgroundTint="@color/itro_green"
         android:text="ĐĂNG NHẬP"
-        android:backgroundTint="#1976D2"
         app:cornerRadius="8.dp" />
 
     <TextView
@@ -58,5 +62,5 @@
         android:layout_gravity="center"
         android:layout_marginTop="16.dp"
         android:text="Chưa có tài khoản? Đăng ký ngay"
-        android:textColor="#1976D2" />
+        android:textColor="@color/itro_green" />
 </LinearLayout>
