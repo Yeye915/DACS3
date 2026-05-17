@@ -29,6 +29,10 @@
         <activity
             android:name=".LoginActivity"
             android:exported="false" />
+        <activity
+            android:name=".BlogActivity"
+            android:exported="false"
+            android:label="Tin Tức và Blog" />
 
     </application>
 

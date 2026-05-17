@@ -28,6 +28,22 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        binding.bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                // Thay R.id.nav_blog bằng ID thực tế trong file menu của bạn
+                R.id.nav_blog -> {
+                    val intent = Intent(this, BlogActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                R.id.nav_home -> {
+                    // Đang ở trang chủ rồi nên không cần làm gì hoặc Toast thông báo
+                    true
+                }
+                else -> false
+            }
+        }
+
         setupRecyclerView()
 
     }
