@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="topBar" type="id" />
+    <item name="bottomNav" type="id" />
+    <item name="rvFeatures" type="id" />
+    <item name="ivBannerItem" type="id" />
+</resources>
