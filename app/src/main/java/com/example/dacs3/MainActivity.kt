@@ -2,6 +2,8 @@ package com.example.dacs3
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -16,44 +18,67 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // 1. Xử lý các sự kiện click cơ bản
+        setupClickListeners()
+
+        // 2. Cài đặt Banner (ViewPager2)
+        setupBanner()
+
+        // 3. Cài đặt danh sách tính năng (RecyclerView)
+        setupRecyclerView()
+    }
+
+    private fun setupClickListeners() {
         binding.tvTopRegister.setOnClickListener {
-            val intent = Intent(this, RegisterActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, RegisterActivity::class.java))
         }
 
-        // 2. Xử lý khi bấm vào chữ "Đăng nhập"
         binding.tvTopLogin.setOnClickListener {
-            // Lệnh này sẽ mở màn hình LoginActivity
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, LoginActivity::class.java))
         }
 
         binding.bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                // Thay R.id.nav_blog bằng ID thực tế trong file menu của bạn
                 R.id.nav_blog -> {
-                    val intent = Intent(this, BlogActivity::class.java)
-                    startActivity(intent)
+                    startActivity(Intent(this, BlogActivity::class.java))
                     true
                 }
-                R.id.nav_home -> {
-                    // Đang ở trang chủ rồi nên không cần làm gì hoặc Toast thông báo
+                R.id.nav_profile -> {
+                    startActivity(Intent(this, ProfileActivity::class.java))
                     true
                 }
+                R.id.nav_home -> true
                 else -> false
             }
         }
-
-        setupRecyclerView()
-
     }
 
+    private fun setupBanner() {
+        // Danh sách ảnh banner
+        val bannerImages = listOf(
+            R.drawable.background,
+            R.drawable.background1,
+            R.drawable.background2,
+            R.drawable.background3
+        )
 
+        val adapter = BannerAdapter(bannerImages)
+        binding.viewPagerBanner.adapter = adapter
 
-
+        // Tự động chuyển ảnh sau 3 giây
+        val handler = Handler(Looper.getMainLooper())
+        val runnable = object : Runnable {
+            override fun run() {
+                val currentItem = binding.viewPagerBanner.currentItem
+                val nextItem = if (currentItem == bannerImages.size - 1) 0 else currentItem + 1
+                binding.viewPagerBanner.setCurrentItem(nextItem, true)
+                handler.postDelayed(this, 3000)
+            }
+        }
+        handler.postDelayed(runnable, 3000)
+    }
 
     private fun setupRecyclerView() {
-        // Chỉ giữ lại các tính năng quản lý cốt lõi trong Grid
         val featureList = listOf(
             Feature(1, "Quản lý nhà/phòng", android.R.drawable.ic_dialog_map),
             Feature(2, "Quản lý khách thuê", android.R.drawable.ic_menu_myplaces),

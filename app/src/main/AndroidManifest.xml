@@ -33,6 +33,10 @@
             android:name=".BlogActivity"
             android:exported="false"
             android:label="Tin Tức và Blog" />
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false"
+            android:label="Trang cá nhân" />
 
     </application>
 

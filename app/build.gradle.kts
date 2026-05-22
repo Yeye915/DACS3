@@ -51,6 +51,9 @@ dependencies {
     // Add the dependencies for the Firebase products you want to use
     // When using the BoM, don't specify versions in Firebase dependencies
     // https://firebase.google.com/docs/android/setup#available-libraries
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+
+    // 2. Thêm các thư viện Firebase cần thiết (không cần ghi số phiên bản nữa)
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
