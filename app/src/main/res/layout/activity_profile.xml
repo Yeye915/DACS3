@@ -54,6 +54,48 @@
                 android:textColor="#333333"
                 android:textSize="22sp"
                 android:textStyle="bold" />
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/toggleRoleGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                app:singleSelection="true"
+                app:selectionRequired="true"
+                app:checkedButton="@+id/btnSeekerMode">
+
+                <Button
+                    android:id="@+id/btnSeekerMode"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Muốn thuê"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/btnHostMode"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Cho thuê"
+                    android:textSize="12sp" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            <LinearLayout
+                android:id="@+id/layoutSeekerMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="visible">
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutHostMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+            </LinearLayout>
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
