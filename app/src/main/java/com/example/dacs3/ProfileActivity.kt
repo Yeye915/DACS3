@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.dacs3.databinding.ActivityProfileBinding
@@ -24,6 +25,7 @@ class ProfileActivity : AppCompatActivity() {
 
         loadUserData()
         setupBottomNavigation()
+        setupRoleToggle()
 
         binding.btnEditAvatar.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK)
@@ -85,6 +87,25 @@ class ProfileActivity : AppCompatActivity() {
             if (imageUri != null) {
                 binding.ivAvatar.setImageURI(imageUri)
                 Toast.makeText(this, "Đã cập nhật ảnh đại diện", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    private fun setupRoleToggle() {
+        // Lắng nghe sự kiện chuyển đổi nút
+        binding.toggleRoleGroup.addOnButtonCheckedListener { group, checkedId, isChecked ->
+            if (isChecked) {
+                when (checkedId) {
+                    R.id.btnSeekerMode -> {
+                        // Hiện menu người thuê, ẩn menu chủ nhà
+                        binding.layoutSeekerMenu.visibility = View.VISIBLE
+                        binding.layoutHostMenu.visibility = View.GONE
+                    }
+                    R.id.btnHostMode -> {
+                        // Hiện menu chủ nhà, ẩn menu người thuê
+                        binding.layoutSeekerMenu.visibility = View.GONE
+                        binding.layoutHostMenu.visibility = View.VISIBLE
+                    }
+                }
             }
         }
     }
