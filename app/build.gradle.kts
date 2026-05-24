@@ -2,6 +2,8 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
+    id("kotlin-kapt")
+    id("org.jetbrains.kotlin.plugin.compose") version "2.3.21"
 }
 
 android {
@@ -32,9 +34,11 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
+
     buildFeatures {
         viewBinding = true
         dataBinding = true
+        compose = true
     }
 }
 
@@ -45,21 +49,43 @@ kotlin {
 }
 
 dependencies {
-    // Import the Firebase BoM
-    implementation(platform(libs.firebase.bom))
 
-    // Add the dependencies for the Firebase products you want to use
-    // When using the BoM, don't specify versions in Firebase dependencies
-    // https://firebase.google.com/docs/android/setup#available-libraries
-    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
-
-    // 2. Thêm các thư viện Firebase cần thiết (không cần ghi số phiên bản nữa)
-
-    implementation(libs.androidx.appcompat)
+    // Core
     implementation(libs.androidx.core.ktx)
-    implementation(libs.firebase.auth)
+    implementation(libs.androidx.appcompat)
     implementation(libs.material)
+
+    // Firebase (Managed by BoM)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.storage)
+    implementation(libs.firebase.database)
+
+    // RecyclerView + CardView
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation("androidx.cardview:cardview:1.0.0")
+
+    // Glide
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    kapt("com.github.bumptech.glide:compiler:4.16.0")
+
+    // Navigation
+    implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
+    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
+
+    // Compose
+    implementation("androidx.activity:activity-compose:1.8.2")
+    implementation(platform("androidx.compose:compose-bom:2024.02.00"))
+
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3")
+
+    // Testing
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }
+

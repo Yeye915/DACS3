@@ -22,7 +22,7 @@
             android:layout_marginStart="8dp"
             android:text="House"
             android:textColor="@color/itro_green"
-            android:textSize="24sp"
+            android:textSize="25sp"
             android:textStyle="bold" />
 
         <View
@@ -86,7 +86,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:text="Xin chào 👋"
-                android:textColor="#000000"
+                android:textColor="@color/itro_green"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -96,6 +96,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:text="Tiện ích quản lý"
+                android:textColor="@color/itro_green"
                 android:textStyle="bold"
                 android:textSize="16sp"/>
 
@@ -112,6 +113,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:text="Danh sách nhà cho thuê"
+                android:textColor="@color/itro_green"
                 android:textStyle="bold"
                 android:textSize="16sp"/>
 

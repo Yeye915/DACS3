@@ -80,12 +80,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         val featureList = listOf(
-            Feature(1, "Quản lý nhà/phòng", android.R.drawable.ic_dialog_map),
-            Feature(2, "Quản lý khách thuê", android.R.drawable.ic_menu_myplaces),
-            Feature(3, "Quản lý tài chính", android.R.drawable.ic_menu_sort_by_size),
-            Feature(4, "Quản lý tài sản", android.R.drawable.ic_menu_agenda),
-            Feature(5, "Quản lý sự cố", android.R.drawable.ic_dialog_alert),
-            Feature(6, "Cài đặt & Thống kê", android.R.drawable.ic_menu_preferences)
+            Feature(1, "Hóa Đơn", android.R.drawable.ic_dialog_map),
+            Feature(2, "Quản Lý Tài Sản", android.R.drawable.ic_menu_myplaces),
+            Feature(3, "Thống Kê", android.R.drawable.ic_menu_sort_by_size),
+            Feature(4, "Sự Cố Và Sửa Chữa", android.R.drawable.ic_menu_agenda),
+            Feature(5, "Bàn Giao Tài Sản Số", android.R.drawable.ic_dialog_alert),
+            Feature(6, "Ví Hợp Đồng", android.R.drawable.ic_menu_preferences)
         )
 
         val adapter = FeatureAdapter(featureList) { selectedFeature ->
