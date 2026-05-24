@@ -65,15 +65,31 @@ class RegisterActivity : AppCompatActivity() {
         auth.createUserWithEmailAndPassword(email, pass)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Đăng ký thành công hệ thống Auth của Firebase
-                    Toast.makeText(this, "Đăng ký thành công tài khoản: $name", Toast.LENGTH_LONG).show()
+                    val userId = auth.currentUser?.uid
+                    val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
 
-                    // Sau khi đăng ký xong, quay về màn hình Login để người dùng đăng nhập lại
-                    finish()
+                    // Tạo đối tượng dữ liệu để lưu
+                    val userMap = hashMapOf(
+                        "fullName" to name,
+                        "email" to email,
+                        "phone" to phone,
+                        "role" to "User" // Mặc định là User
+                    )
+
+                    // Lưu vào Collection "Users" với ID là userId vừa tạo
+                    if (userId != null) {
+                        db.collection("Users").document(userId)
+                            .set(userMap)
+                            .addOnSuccessListener {
+                                Toast.makeText(this, "Đăng ký và lưu dữ liệu thành công!", Toast.LENGTH_SHORT).show()
+                                finish()
+                            }
+                            .addOnFailureListener { e ->
+                                Toast.makeText(this, "Lỗi lưu dữ liệu: ${e.message}", Toast.LENGTH_SHORT).show()
+                            }
+                    }
                 } else {
-                    // Nếu thất bại (Ví dụ: Email đã tồn tại, không có mạng...)
-                    val errorMessage = task.exception?.message ?: "Lỗi không xác định"
-                    Toast.makeText(this, "Đăng ký thất bại: $errorMessage", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Lỗi: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
             }
     }

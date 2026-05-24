@@ -16,35 +16,32 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.btnLogin.setOnClickListener {
-            val email = binding.etUsername.text.toString().trim() // .trim() để xóa khoảng trắng thừa
+            val email = binding.etUsername.text.toString().trim()
             val password = binding.etPassword.text.toString().trim()
 
-            // 1. Kiểm tra không được để trống
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Vui lòng nhập email và mật khẩu", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // 2. Logic phân quyền dựa trên Email
-            val role: String
-            val intent: Intent
+            // Sử dụng Firebase Auth để đăng nhập thật
+            val auth = com.google.firebase.auth.FirebaseAuth.getInstance()
 
-            if (email == "chutro@gmail.com") {
-                role = "Chủ trọ"
-                // Chuyển đến màn hình Dashboard của Chủ trọ (MainActivity bạn đã làm)
-                intent = Intent(this, MainActivity::class.java)
-            } else {
-                role = "Khách thuê"
-                // Chuyển đến màn hình dành cho Khách thuê
-                // (Nếu chưa có, bạn có thể tạm thời dùng MainActivity hoặc tạo mới TenantActivity)
-                intent = Intent(this, MainActivity::class.java)
-                // Sau này bạn thay MainActivity ở trên thành TenantActivity::class.java nhé
-            }
+            auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        // Đăng nhập thành công
+                        Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show()
 
-            // 3. Thông báo và chuyển màn hình
-            Toast.makeText(this, "Đăng nhập thành công với quyền $role", Toast.LENGTH_SHORT).show()
-            startActivity(intent)
-            finish() // Đóng màn hình Login để người dùng không quay lại được bằng nút Back
+                        // Vào thẳng màn hình chính (MainActivity)
+                        val intent = Intent(this, MainActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        // Đăng nhập thất bại (sai pass, email chưa đăng ký...)
+                        Toast.makeText(this, "Lỗi: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
         }
 
         binding.tvGoToRegister.setOnClickListener {

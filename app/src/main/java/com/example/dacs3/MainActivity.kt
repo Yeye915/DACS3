@@ -4,31 +4,74 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dacs3.databinding.ActivityMainBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 1. Xử lý các sự kiện click cơ bản
-        setupClickListeners()
+        // Khởi tạo Firebase
+        auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
 
-        // 2. Cài đặt Banner (ViewPager2)
+        // 1. Cài đặt các thành phần giao diện
         setupBanner()
+        setupHouseRecyclerView()
 
-        // 3. Cài đặt danh sách tính năng (RecyclerView)
-        setupRecyclerView()
+        // 2. Xử lý logic người dùng và Navigation
+        fetchUserRoleAndSetupFeatures()
+        setupNavigationAndClicks()
     }
 
-    private fun setupClickListeners() {
+    override fun onResume() {
+        super.onResume()
+        // Cập nhật trạng thái đăng nhập khi quay lại app
+        fetchUserRoleAndSetupFeatures()
+        // Đảm bảo icon Trang chủ luôn sáng khi ở đây
+        binding.bottomNav.selectedItemId = R.id.nav_home
+    }
+
+    private fun setupNavigationAndClicks() {
+        // Mặc định mục Trang chủ sáng đèn
+        binding.bottomNav.selectedItemId = R.id.nav_home
+
+        // Xử lý sự kiện Bottom Navigation
+        binding.bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> true // Đang ở Home rồi, không làm gì cả
+                R.id.nav_rooms -> {
+                    Toast.makeText(this, "Tính năng Nhà/Phòng", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                R.id.nav_blog -> {
+                    startActivity(Intent(this, BlogActivity::class.java))
+                    overridePendingTransition(0, 0)
+                    true
+                }
+                R.id.nav_profile -> {
+                    startActivity(Intent(this, ProfileActivity::class.java))
+                    overridePendingTransition(0, 0)
+                    true
+                }
+                else -> false
+            }
+        }
+
+        // Click listeners cho Top Bar
         binding.tvTopRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
@@ -36,36 +79,71 @@ class MainActivity : AppCompatActivity() {
         binding.tvTopLogin.setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
         }
+    }
 
-        binding.bottomNav.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_blog -> {
-                    startActivity(Intent(this, BlogActivity::class.java))
-                    true
+    private fun fetchUserRoleAndSetupFeatures() {
+        val currentUser = auth.currentUser
+
+        val allFeatures = listOf(
+            Feature(1, "Hóa Đơn", android.R.drawable.ic_dialog_map),
+            Feature(2, "Quản Lý Tài Sản", android.R.drawable.ic_menu_myplaces),
+            Feature(3, "Thống Kê", android.R.drawable.ic_menu_sort_by_size),
+            Feature(4, "Sự Cố Và Sửa Chữa", android.R.drawable.ic_menu_agenda),
+            Feature(5, "Bàn Giao Tài Sản Số", android.R.drawable.ic_dialog_alert),
+            Feature(6, "Ví Hợp Đồng", android.R.drawable.ic_menu_preferences)
+        )
+
+        if (currentUser != null) {
+            binding.tvTopLogin.visibility = View.GONE
+            binding.tvTopRegister.visibility = View.GONE
+            binding.tvUserNameTop.visibility = View.VISIBLE
+
+            db.collection("Users").document(currentUser.uid).get()
+                .addOnSuccessListener { document ->
+                    if (document != null && document.exists()) {
+                        val userName = document.getString("fullName") ?: "Người dùng"
+                        binding.tvUserNameTop.text = " $userName"
+                    }
+                    renderRecyclerView(allFeatures)
                 }
-                R.id.nav_profile -> {
-                    startActivity(Intent(this, ProfileActivity::class.java))
-                    true
+                .addOnFailureListener {
+                    renderRecyclerView(allFeatures)
                 }
-                R.id.nav_home -> true
-                else -> false
-            }
+        } else {
+            binding.tvTopLogin.visibility = View.VISIBLE
+            binding.tvTopRegister.visibility = View.VISIBLE
+            binding.tvUserNameTop.visibility = View.GONE
+            renderRecyclerView(allFeatures)
         }
     }
 
-    private fun setupBanner() {
-        // Danh sách ảnh banner
-        val bannerImages = listOf(
-            R.drawable.background,
-            R.drawable.background1,
-            R.drawable.background2,
-            R.drawable.background3
+    private fun setupHouseRecyclerView() {
+        val sampleHouses = listOf(
+            House(1, "Phòng trọ gác xép mới xây", "Gần đại học VKU, Đà Nẵng", "1.500.000 VNĐ/tháng", R.drawable.background),
+            House(2, "Căn hộ mini Full nội thất", "Đường Trần Đại Nghĩa, Đà Nẵng", "2.800.000 VNĐ/tháng", R.drawable.background1),
+            House(3, "Phòng trọ giá rẻ cho sinh viên", "Khu dân cư Nam cầu Cẩm Lệ", "1.200.000 VNĐ/tháng", R.drawable.background2)
         )
 
-        val adapter = BannerAdapter(bannerImages)
-        binding.viewPagerBanner.adapter = adapter
+        val adapter = HouseAdapter(sampleHouses) { selectedHouse ->
+            Toast.makeText(this, "Bạn đang xem: ${selectedHouse.title}", Toast.LENGTH_SHORT).show()
+        }
 
-        // Tự động chuyển ảnh sau 3 giây
+        binding.rvHouses.layoutManager = LinearLayoutManager(this)
+        binding.rvHouses.adapter = adapter
+    }
+
+    private fun renderRecyclerView(features: List<Feature>) {
+        val adapter = FeatureAdapter(features) { selectedFeature ->
+            Toast.makeText(this, "Bạn chọn: ${selectedFeature.title}", Toast.LENGTH_SHORT).show()
+        }
+        binding.rvFeatures.layoutManager = GridLayoutManager(this, 2)
+        binding.rvFeatures.adapter = adapter
+    }
+
+    private fun setupBanner() {
+        val bannerImages = listOf(R.drawable.background, R.drawable.background1, R.drawable.background2, R.drawable.background3)
+        binding.viewPagerBanner.adapter = BannerAdapter(bannerImages)
+
         val handler = Handler(Looper.getMainLooper())
         val runnable = object : Runnable {
             override fun run() {
@@ -76,23 +154,5 @@ class MainActivity : AppCompatActivity() {
             }
         }
         handler.postDelayed(runnable, 3000)
-    }
-
-    private fun setupRecyclerView() {
-        val featureList = listOf(
-            Feature(1, "Hóa Đơn", android.R.drawable.ic_dialog_map),
-            Feature(2, "Quản Lý Tài Sản", android.R.drawable.ic_menu_myplaces),
-            Feature(3, "Thống Kê", android.R.drawable.ic_menu_sort_by_size),
-            Feature(4, "Sự Cố Và Sửa Chữa", android.R.drawable.ic_menu_agenda),
-            Feature(5, "Bàn Giao Tài Sản Số", android.R.drawable.ic_dialog_alert),
-            Feature(6, "Ví Hợp Đồng", android.R.drawable.ic_menu_preferences)
-        )
-
-        val adapter = FeatureAdapter(featureList) { selectedFeature ->
-            Toast.makeText(this, "Bạn chọn: ${selectedFeature.title}", Toast.LENGTH_SHORT).show()
-        }
-
-        binding.rvFeatures.layoutManager = GridLayoutManager(this, 2)
-        binding.rvFeatures.adapter = adapter
     }
 }

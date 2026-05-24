@@ -15,6 +15,9 @@
         <item name="android:focusable">true</item>
         <item name="android:background">?attr/selectableItemBackground</item>
     </style>
+    <style name="CircleImage">
+        <item name="cornerSize">50%</item>
+    </style>
 
     <style name="DividerStyle">
         <item name="android:layout_width">match_parent</item>
