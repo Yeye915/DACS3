@@ -40,6 +40,12 @@ class ProfileActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+        binding.btnPersonalInfo.setOnClickListener {
+            // Lệnh chuyển sang trang EditProfileActivity
+            val intent = Intent(this, EditProfileActivity::class.java)
+            startActivity(intent)
+        }
+
     }
 
     private fun loadUserData() {
@@ -53,8 +59,8 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun setupBottomNavigation() {
-        // ĐÃ SỬA: Luôn bắt đầu sáng đèn ở mục Trang chủ
-        binding.bottomNavProfile.selectedItemId = R.id.nav_home
+
+        binding.bottomNavProfile.selectedItemId = R.id.nav_profile
 
         binding.bottomNavProfile.setOnItemSelectedListener { item ->
             when (item.itemId) {
