@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dacs3.databinding.ActivityMainBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlin.jvm.java
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,10 +40,24 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Cập nhật trạng thái đăng nhập khi quay lại app
-        fetchUserRoleAndSetupFeatures()
-        // Đảm bảo icon Trang chủ luôn sáng khi ở đây
-        binding.bottomNav.selectedItemId = R.id.nav_home
+        val sharedPref = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+        val role = sharedPref.getString("user_role", "seeker")
+
+        if (role == "host") {
+            binding.btnContractWallet.text = "Ví hợp đồng (Chủ nhà)"
+            binding.btnContractWallet.setOnClickListener {
+                // Chuyển sang trang ví của chủ nhà
+                val intent = Intent(this, HostWalletActivity::class.java)
+                startActivity(intent)
+            }
+        } else {
+            binding.btnContractWallet.text = "Ví hợp đồng (Người thuê)"
+            binding.btnContractWallet.setOnClickListener {
+                // Chuyển sang trang ví của người thuê
+                val intent = Intent(this, TenantWalletActivity::class.java)
+                startActivity(intent)
+            }
+        }
     }
 
     private fun setupNavigationAndClicks() {
@@ -54,19 +69,25 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_home -> true // Đang ở Home rồi, không làm gì cả
                 R.id.nav_rooms -> {
-                    Toast.makeText(this, "Tính năng Nhà/Phòng", Toast.LENGTH_SHORT).show()
-                    true
-                }
-                R.id.nav_blog -> {
-                    startActivity(Intent(this, BlogActivity::class.java))
+                    // Nếu Nhi đã có PropertyActivity thì mở nó ra nhé
+                    startActivity(Intent(this, PropertyActivity::class.java))
                     overridePendingTransition(0, 0)
+                    finish() // Đóng MainActivity để giải phóng bộ nhớ
                     true
                 }
+
+                R.id.nav_blog -> {
+                    startActivity(Intent(this, NewsActivity::class.java))
+                    overridePendingTransition(0, 0)
+                    finish()
+                    true
+                }
+
                 R.id.nav_profile -> {
                     startActivity(Intent(this, ProfileActivity::class.java))
                     overridePendingTransition(0, 0)
-                    true
-                }
+                    finish()
+                    true}
                 else -> false
             }
         }
@@ -76,9 +97,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
 
-        binding.tvTopLogin.setOnClickListener {
-            startActivity(Intent(this, LoginActivity::class.java))
-        }
+
     }
 
     private fun fetchUserRoleAndSetupFeatures() {
@@ -134,7 +153,21 @@ class MainActivity : AppCompatActivity() {
 
     private fun renderRecyclerView(features: List<Feature>) {
         val adapter = FeatureAdapter(features) { selectedFeature ->
-            Toast.makeText(this, "Bạn chọn: ${selectedFeature.title}", Toast.LENGTH_SHORT).show()
+            when (selectedFeature.id) {
+                6 -> { // ID của Ví Hợp Đồng là 6
+                    val sharedPref = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+                    val role = sharedPref.getString("user_role", "seeker")
+
+                    if (role == "host") {
+                        startActivity(Intent(this, HostWalletActivity::class.java))
+                    } else {
+                        startActivity(Intent(this, TenantWalletActivity::class.java))
+                    }
+                }
+                else -> {
+                    Toast.makeText(this, "Bạn chọn: ${selectedFeature.title}", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
         binding.rvFeatures.layoutManager = GridLayoutManager(this, 2)
         binding.rvFeatures.adapter = adapter

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- IMAGE -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="280dp">
+
+            <ImageView
+                android:id="@+id/imgNews"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"/>
+
+            <!-- BACK -->
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="top|start"
+                android:layout_margin="16dp"
+                android:background="#FFFFFF"
+                android:padding="8dp"
+                android:src="@android:drawable/ic_media_previous"/>
+
+        </FrameLayout>
+
+        <!-- CONTENT -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- CATEGORY -->
+            <TextView
+                android:id="@+id/txtCategory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="News"
+                android:textColor="#6A1B9A"
+                android:textStyle="bold"
+                android:textSize="14sp"/>
+
+            <!-- TITLE -->
+            <TextView
+                android:id="@+id/txtTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="News Title"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:layout_marginTop="10dp"/>
+
+            <!-- DESCRIPTION -->
+            <TextView
+                android:id="@+id/txtDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="News description..."
+                android:textSize="16sp"
+                android:lineSpacingExtra="4dp"
+                android:layout_marginTop="16dp"/>
+
+            <!-- LIKE BUTTON -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLike"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="Like ❤️"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="24dp"
+                android:backgroundTint="#E91E63"/>
+
+            <!-- SHARE BUTTON -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnShare"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="Share 📤"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="#3F51B5"/>
+
+            <!-- COMMENT TITLE -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Comments"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:layout_marginTop="30dp"/>
+
+            <!-- COMMENT LIST -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerComment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:layout_marginTop="12dp"/>
+
+            <!-- INPUT COMMENT -->
+            <EditText
+                android:id="@+id/edtComment"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Write comment..."
+                android:paddingHorizontal="12dp"
+                android:layout_marginTop="16dp"/>
+
+            <!-- SEND COMMENT -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSendComment"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="Send Comment"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="#6A1B9A"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

@@ -45,6 +45,12 @@ class ProfileActivity : AppCompatActivity() {
             val intent = Intent(this, EditProfileActivity::class.java)
             startActivity(intent)
         }
+        // Kết nối nút hỗ trợ với trang AI mới
+        binding.btnSupport.setOnClickListener {
+            val intent = Intent(this, ChatAIActivity::class.java)
+            startActivity(intent)
+        }
+
 
     }
 
@@ -71,11 +77,14 @@ class ProfileActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_rooms -> {
-                    Toast.makeText(this, "Tính năng Nhà/Phòng", Toast.LENGTH_SHORT).show()
+                    // Nếu Nhi đã có PropertyActivity thì mở nó ra nhé
+                    startActivity(Intent(this, PropertyActivity::class.java))
+                    overridePendingTransition(0, 0)
+                    finish() // Đóng MainActivity để giải phóng bộ nhớ
                     true
                 }
                 R.id.nav_blog -> {
-                    startActivity(Intent(this, BlogActivity::class.java))
+                    startActivity(Intent(this, NewsActivity::class.java))
                     overridePendingTransition(0, 0)
                     finish()
                     true
@@ -97,19 +106,23 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
     private fun setupRoleToggle() {
-        // Lắng nghe sự kiện chuyển đổi nút
         binding.toggleRoleGroup.addOnButtonCheckedListener { group, checkedId, isChecked ->
             if (isChecked) {
+                val sharedPref = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+                val editor = sharedPref.edit()
+
                 when (checkedId) {
                     R.id.btnSeekerMode -> {
-                        // Hiện menu người thuê, ẩn menu chủ nhà
                         binding.layoutSeekerMenu.visibility = View.VISIBLE
                         binding.layoutHostMenu.visibility = View.GONE
+                        // Lưu lại là đang ở chế độ người thuê
+                        editor.putString("user_role", "seeker").apply()
                     }
                     R.id.btnHostMode -> {
-                        // Hiện menu chủ nhà, ẩn menu người thuê
                         binding.layoutSeekerMenu.visibility = View.GONE
                         binding.layoutHostMenu.visibility = View.VISIBLE
+                        // Lưu lại là đang ở chế độ chủ nhà
+                        editor.putString("user_role", "host").apply()
                     }
                 }
             }

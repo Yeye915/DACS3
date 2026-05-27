@@ -151,5 +151,13 @@
         app:itemTextColor="@color/itro_green"
         app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_menu" />
+    <Button
+        android:id="@+id/btnContractWallet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Ví hợp đồng"
+        android:backgroundTint="@color/itro_green"
+        android:textColor="#FFFFFF" />
 
 </RelativeLayout>

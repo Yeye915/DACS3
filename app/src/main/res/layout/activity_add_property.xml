@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Property"
+            android:textSize="28sp"
+            android:textStyle="bold"/>
+
+        <!-- Title -->
+        <EditText
+            android:id="@+id/edtTitle"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:hint="Property Title"
+            android:layout_marginTop="20dp"/>
+
+        <!-- Price -->
+        <EditText
+            android:id="@+id/edtPrice"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:hint="Price"
+            android:layout_marginTop="12dp"/>
+
+        <!-- Location -->
+        <EditText
+            android:id="@+id/edtLocation"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:hint="Location"
+            android:layout_marginTop="12dp"/>
+
+        <!-- Bedroom -->
+        <EditText
+            android:id="@+id/edtBedroom"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:hint="Bedrooms"
+            android:inputType="number"
+            android:layout_marginTop="12dp"/>
+
+        <!-- Bathroom -->
+        <EditText
+            android:id="@+id/edtBathroom"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:hint="Bathrooms"
+            android:inputType="number"
+            android:layout_marginTop="12dp"/>
+
+        <!-- Area -->
+        <EditText
+            android:id="@+id/edtArea"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:hint="Area"
+            android:layout_marginTop="12dp"/>
+
+        <!-- Image URL -->
+        <EditText
+            android:id="@+id/edtImage"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:hint="Image URL"
+            android:layout_marginTop="12dp"/>
+
+        <!-- Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddProperty"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:text="Add Property"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="#6A1B9A"/>
+
+    </LinearLayout>
+
+</ScrollView>
