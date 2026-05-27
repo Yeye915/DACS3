@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- PROPERTY IMAGE -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="300dp">
+
+            <ImageView
+                android:id="@+id/imgProperty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"/>
+
+            <!-- BACK -->
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="top|start"
+                android:layout_margin="16dp"
+                android:background="#FFFFFF"
+                android:padding="8dp"
+                android:src="@android:drawable/ic_media_previous"/>
+
+            <!-- FAVORITE -->
+            <ImageView
+                android:id="@+id/btnFavorite"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="top|end"
+                android:layout_margin="16dp"
+                android:background="#FFFFFF"
+                android:padding="8dp"
+                android:src="@android:drawable/btn_star_big_off"/>
+
+        </FrameLayout>
+
+        <!-- CONTENT -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- PRICE -->
+            <TextView
+                android:id="@+id/txtPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="$1200/month"
+                android:textColor="#E64A19"
+                android:textSize="28sp"
+                android:textStyle="bold"/>
+
+            <!-- TITLE -->
+            <TextView
+                android:id="@+id/txtTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Luxury Apartment"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_marginTop="10dp"/>
+
+            <!-- LOCATION -->
+            <TextView
+                android:id="@+id/txtLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Da Nang, Vietnam"
+                android:textColor="#777777"
+                android:textSize="16sp"
+                android:layout_marginTop="8dp"/>
+
+            <!-- AREA -->
+            <TextView
+                android:id="@+id/txtArea"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="120m²"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="12dp"/>
+
+            <!-- RATING -->
+            <RatingBar
+                android:id="@+id/ratingBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:numStars="5"
+                android:stepSize="0.5"
+                android:rating="4"
+                android:scaleX="0.8"
+                android:scaleY="0.8"
+                android:layout_marginTop="12dp"/>
+
+            <!-- DESCRIPTION TITLE -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Description"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:layout_marginTop="24dp"/>
+
+            <!-- DESCRIPTION -->
+            <TextView
+                android:id="@+id/txtDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Luxury modern property with beautiful interior design, large bedrooms, modern kitchen and premium location."
+                android:textSize="16sp"
+                android:layout_marginTop="10dp"
+                android:lineSpacingExtra="4dp"/>
+
+            <!-- VIEW MAP -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnMap"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:text="View on Map"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="24dp"
+                android:backgroundTint="#6A1B9A"/>
+
+            <!-- CHAT -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnChat"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:text="Chat Owner"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="#8E24AA"/>
+
+            <!-- CONTACT -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnContact"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:text="Contact Owner"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="#3949AB"/>
+
+            <!-- COMMENT TITLE -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Comments"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:layout_marginTop="24dp"/>
+
+            <!-- COMMENT LIST -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerComment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:layout_marginTop="10dp"/>
+
+            <!-- COMMENT INPUT -->
+            <EditText
+                android:id="@+id/edtComment"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Write comment..."
+                android:layout_marginTop="14dp"
+                android:paddingHorizontal="12dp"/>
+
+            <!-- SEND COMMENT -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSendComment"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="Send Comment"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="10dp"
+                android:backgroundTint="#6A1B9A"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -23,21 +25,20 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".RegisterActivity"
-            android:exported="false" />
-        <activity
-            android:name=".LoginActivity"
-            android:exported="false" />
-        <activity
-            android:name=".BlogActivity"
-            android:exported="false"
-            android:label="Tin Tức và Blog" />
-        <activity
-            android:name=".ProfileActivity"
-            android:exported="false"
-            android:label="Trang cá nhân" />
-        <activity android:name=".EditProfileActivity" />
+        <activity android:name=".RegisterActivity" android:exported="false" />
+        <activity android:name=".LoginActivity" android:exported="false" />
+        <activity android:name=".BlogActivity" android:exported="false" />
+        <activity android:name=".ProfileActivity" android:exported="false" />
+        <activity android:name=".EditProfileActivity" android:exported="false" />
+        <activity android:name=".ChatAIActivity" android:exported="false" />
+        <activity android:name=".HostWalletActivity" android:exported="false" />
+        <activity android:name=".TenantWalletActivity" android:exported="false" />
+        <activity android:name=".PropertyActivity" android:exported="false" />
+        <activity android:name=".PropertyDetailActivity" android:exported="false" />
+        <activity android:name=".AddPropertyActivity" android:exported="false" />
+        <activity android:name=".ChatActivity" android:exported="false" />
+        <activity android:name=".NewsActivity" android:exported="false" />
+        <activity android:name=".NewsDetailActivity" android:exported="false" />
 
     </application>
 
