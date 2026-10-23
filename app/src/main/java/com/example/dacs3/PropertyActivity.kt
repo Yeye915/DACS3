@@ -154,38 +154,26 @@ class PropertyActivity : AppCompatActivity() {
     // ===================================
 
     private fun loadProperties() {
-
         firestore.collection("properties")
-            .get()
-
-            .addOnSuccessListener { documents ->
-
-                propertyList.clear()
-
-                filteredList.clear()
-
-                for (document in documents) {
-
-                    val property =
-                        document.toObject(
-                            Property::class.java
-                        )
-
-                    propertyList.add(property)
+            .addSnapshotListener { snapshots, e ->
+                if (e != null) {
+                    Toast.makeText(this, "Lỗi lắng nghe dữ liệu", Toast.LENGTH_SHORT).show()
+                    return@addSnapshotListener
                 }
 
-                filteredList.addAll(propertyList)
+                if (snapshots != null) {
+                    propertyList.clear()
+                    filteredList.clear()
 
-                adapter.notifyDataSetChanged()
-            }
+                    for (document in snapshots) {
+                        val property = document.toObject(Property::class.java)
+                        property.id = document.id // KÍCH HOẠT DÒNG NÀY: Lấy ID từ Firestore gán vào cấu trúc
+                        propertyList.add(property)
+                    }
 
-            .addOnFailureListener {
-
-                Toast.makeText(
-                    this,
-                    "Không thể tải dữ liệu",
-                    Toast.LENGTH_SHORT
-                ).show()
+                    filteredList.addAll(propertyList)
+                    adapter.notifyDataSetChanged()
+                }
             }
     }
 
@@ -269,18 +257,10 @@ class PropertyActivity : AppCompatActivity() {
     // ===================================
 
     private fun setupAddButton() {
-
-        binding.btnAddProperty
-            .setOnClickListener {
-
-                Toast.makeText(
-                    this,
-                    "Thêm phòng mới",
-                    Toast.LENGTH_SHORT
-                ).show()
-
-                // TODO:
-                // OPEN ADD PROPERTY SCREEN
-            }
+        binding.btnAddProperty.setOnClickListener {
+            // Mở màn hình AddPropertyActivity
+            val intent = Intent(this, AddPropertyActivity::class.java)
+            startActivity(intent)
+        }
     }
 }

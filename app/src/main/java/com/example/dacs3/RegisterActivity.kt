@@ -35,6 +35,13 @@ class RegisterActivity : AppCompatActivity() {
         val pass = binding.etPassReg.text.toString().trim()
         val confirmPass = binding.etConfirmPass.text.toString().trim()
 
+        // Lấy vai trò được chọn từ RadioGroup (Mới thêm)
+        val selectedRole = if (binding.rbHost.isChecked) {
+            "host"   // Chủ nhà
+        } else {
+            "seeker" // Người tìm phòng / Người thuê
+        }
+
         // Kiểm tra điều kiện bỏ trống
         if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || pass.isEmpty() || confirmPass.isEmpty()) {
             Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show()
@@ -58,8 +65,7 @@ class RegisterActivity : AppCompatActivity() {
             return
         }
 
-        // --- 4. TIẾN HÀNH ĐĂNG KÝ VỚI FIREBASE ---
-        // Hiển thị thông báo đang xử lý để người dùng chờ
+        // --- TIẾN HÀNH ĐĂNG KÝ VỚI FIREBASE ---
         Toast.makeText(this, "Đang xử lý đăng ký...", Toast.LENGTH_SHORT).show()
 
         auth.createUserWithEmailAndPassword(email, pass)
@@ -68,20 +74,20 @@ class RegisterActivity : AppCompatActivity() {
                     val userId = auth.currentUser?.uid
                     val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
 
-                    // Tạo đối tượng dữ liệu để lưu
+                    // Đưa giá trị selectedRole vào Map để lưu lên Firestore
                     val userMap = hashMapOf(
                         "fullName" to name,
                         "email" to email,
                         "phone" to phone,
-                        "role" to "User" // Mặc định là User
+                        "role" to selectedRole // Thay vì để mặc định "User", ta lưu role thật
                     )
 
-                    // Lưu vào Collection "Users" với ID là userId vừa tạo
+                    // Lưu vào Collection "Users"
                     if (userId != null) {
                         db.collection("Users").document(userId)
                             .set(userMap)
                             .addOnSuccessListener {
-                                Toast.makeText(this, "Đăng ký và lưu dữ liệu thành công!", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show()
                                 finish()
                             }
                             .addOnFailureListener { e ->

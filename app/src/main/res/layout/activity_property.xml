@@ -7,6 +7,8 @@
     android:layout_height="match_parent"
     android:background="@color/background">
 
+
+
     <!-- TOP BAR -->
     <LinearLayout
         android:id="@+id/topBar"
@@ -92,12 +94,13 @@
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@color/white"
+        android:background="#FFFFFF"
+        app:elevation="8dp"
         app:itemIconTint="@color/itro_green"
         app:itemTextColor="@color/itro_green"
         app:labelVisibilityMode="labeled"
-        app:menu="@menu/bottom_nav_menu"/>
+        app:menu="@menu/bottom_nav_menu" />
 
 </RelativeLayout>

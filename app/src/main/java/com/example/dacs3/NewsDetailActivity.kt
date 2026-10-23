@@ -37,17 +37,11 @@ class NewsDetailActivity : AppCompatActivity() {
             FirebaseFirestore.getInstance()
 
         // GET DATA
-        val title =
-            intent.getStringExtra("title")
-
-        val description =
-            intent.getStringExtra("description")
-
-        val image =
-            intent.getStringExtra("image")
-
-        val category =
-            intent.getStringExtra("category")
+        val newsId = intent.getStringExtra("newsId")
+        val title = intent.getStringExtra("title")
+        val description = intent.getStringExtra("description")
+        val image = intent.getStringExtra("imageUrl")
+        val category = intent.getStringExtra("category")
 
         // SET DATA
         binding.txtTitle.text =
@@ -83,7 +77,7 @@ class NewsDetailActivity : AppCompatActivity() {
         binding.btnLike.setOnClickListener {
 
             binding.btnLike.text =
-                "Liked ❤️"
+                "Đã thích ❤️"
         }
 
         // SHARE
@@ -138,51 +132,34 @@ class NewsDetailActivity : AppCompatActivity() {
 
     // SEND COMMENT
     private fun sendComment() {
+        val text = binding.edtComment.text.toString().trim()
+        val newsId = intent.getStringExtra("newsId") // Lấy ID bài viết từ Intent
 
-        val text =
-            binding.edtComment.text
-                .toString()
-
-        if (text.isEmpty()) {
-
-            return
-        }
+        if (text.isEmpty() || newsId == null) return
 
         val comment = hashMapOf(
-
-            "username" to "Guest",
-
-            "content" to text
+            "newsId" to newsId, // Lưu ID bài để biết bình luận này của bài nào
+            "username" to "Người dùng",
+            "content" to text,
+            "timestamp" to System.currentTimeMillis()
         )
 
-        firestore.collection("news_comments")
-            .add(comment)
-
+        firestore.collection("news_comments").add(comment)
         binding.edtComment.text.clear()
     }
 
     // LOAD COMMENT
     private fun loadComments() {
+        val newsId = intent.getStringExtra("newsId")
 
         firestore.collection("news_comments")
-
+            .whereEqualTo("newsId", newsId) // CHỈ lấy bình luận của bài này
             .addSnapshotListener { value, _ ->
-
                 commentList.clear()
-
-                value?.documents?.forEach {
-
-                    val comment =
-                        it.toObject(
-                            Comment::class.java
-                        )
-
-                    if (comment != null) {
-
-                        commentList.add(comment)
-                    }
+                value?.forEach { doc ->
+                    val comment = doc.toObject(Comment::class.java)
+                    commentList.add(comment)
                 }
-
                 adapter.notifyDataSetChanged()
             }
     }

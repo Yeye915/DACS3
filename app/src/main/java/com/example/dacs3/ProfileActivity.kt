@@ -50,6 +50,27 @@ class ProfileActivity : AppCompatActivity() {
             val intent = Intent(this, ChatAIActivity::class.java)
             startActivity(intent)
         }
+        binding.btnNotifications.setOnClickListener {
+            val intent = Intent(this, NotificationListActivity::class.java)
+            startActivity(intent)
+        }
+        binding.btnSettings.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
+        // Đọc lại role đã lưu để hiển thị đúng nút khi vừa vào trang
+        val sharedPref = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+        val role = sharedPref.getString("user_role", "seeker")
+
+        if (role == "host") {
+            binding.toggleRoleGroup.check(R.id.btnHostMode)
+            binding.layoutHostMenu.visibility = View.VISIBLE
+            binding.layoutSeekerMenu.visibility = View.GONE
+        } else {
+            binding.toggleRoleGroup.check(R.id.btnSeekerMode)
+            binding.layoutSeekerMenu.visibility = View.VISIBLE
+            binding.layoutHostMenu.visibility = View.GONE
+        }
 
 
     }
@@ -105,6 +126,7 @@ class ProfileActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun setupRoleToggle() {
         binding.toggleRoleGroup.addOnButtonCheckedListener { group, checkedId, isChecked ->
             if (isChecked) {

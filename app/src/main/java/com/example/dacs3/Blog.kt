@@ -6,5 +6,5 @@ data class Blog(
     val content: String = "",
     val author: String = "",
     val date: String = "",
-    val imageUrl: String = "house1.jpg" // Nếu bạn muốn hiển thị ảnh minh họa
+    val imageUrl: String = "house1.jpg"
 )

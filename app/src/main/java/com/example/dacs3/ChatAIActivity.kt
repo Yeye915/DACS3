@@ -18,7 +18,7 @@ class ChatAIActivity : AppCompatActivity() {
 
     private val generativeModel = GenerativeModel(
         modelName = "gemini-2.5-flash",
-        apiKey = "AIzaSyCgerrozztJPUc2GFSWctVods4f6HrnNFw" // Nhớ thay Key thật của Nhi vào đây
+        apiKey = "AQ.Ab8RN6JIcC4OUY0lgPwb3gTHdmrUalboddwVFafLsjtUdmeYBQ" // Nhớ thay Key thật của Nhi vào đây
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {

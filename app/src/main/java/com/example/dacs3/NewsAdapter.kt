@@ -36,7 +36,8 @@ class NewsAdapter(
 
         val news = newsList[position]
 
-
+        holder.binding.txtCategory.text =
+            news.category
 
         holder.binding.txtTitle.text =
             news.title
@@ -59,6 +60,8 @@ class NewsAdapter(
                 holder.itemView.context,
                 NewsDetailActivity::class.java
             )
+            intent.putExtra("newsId",
+                news.id)
 
             intent.putExtra(
                 "title",

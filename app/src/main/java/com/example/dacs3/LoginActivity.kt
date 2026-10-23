@@ -29,17 +29,34 @@ class LoginActivity : AppCompatActivity() {
 
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
+                    // Trong LoginActivity.kt -> phần auth.signInWithEmailAndPassword().addOnCompleteListener
                     if (task.isSuccessful) {
-                        // Đăng nhập thành công
                         Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show()
 
-                        // Vào thẳng màn hình chính (MainActivity)
-                        val intent = Intent(this, MainActivity::class.java)
-                        startActivity(intent)
-                        finish()
-                    } else {
-                        // Đăng nhập thất bại (sai pass, email chưa đăng ký...)
-                        Toast.makeText(this, "Lỗi: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                        val userId = auth.currentUser?.uid
+                        if (userId != null) {
+                            // Lấy role từ Firestore về để lưu tạm vào máy máy
+                            com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                                .collection("Users").document(userId).get()
+                                .addOnSuccessListener { document ->
+                                    val role = document.getString("role") ?: "seeker"
+
+                                    // Lưu vào SharedPreferences để MainActivity đọc được
+                                    val sharedPref = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+                                    sharedPref.edit().putString("user_role", role).apply()
+
+                                    // Chuyển màn hình
+                                    val intent = Intent(this, MainActivity::class.java)
+                                    startActivity(intent)
+                                    finish()
+                                }
+                                .addOnFailureListener {
+                                    // Nếu lỗi mạng không lấy được dữ liệu, vẫn cho vào màn hình chính với quyền mặc định
+                                    val intent = Intent(this, MainActivity::class.java)
+                                    startActivity(intent)
+                                    finish()
+                                }
+                        }
                     }
                 }
         }

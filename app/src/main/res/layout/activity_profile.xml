@@ -70,6 +70,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Muốn thuê"
+                    android:enabled="false"
                     android:textSize="12sp" />
 
                 <Button
@@ -78,6 +79,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Cho thuê"
+                    android:enabled="false"
                     android:textSize="12sp" />
             </com.google.android.material.button.MaterialButtonToggleGroup>
 

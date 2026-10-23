@@ -2,6 +2,8 @@ package com.example.dacs3
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -10,21 +12,40 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class NewsActivity : AppCompatActivity() {
 
+    // ===================================
     // VIEW BINDING
+    // ===================================
+
     private lateinit var binding:
             ActivityNewsBinding
 
+    // ===================================
     // FIREBASE
+    // ===================================
+
     private lateinit var firestore:
             FirebaseFirestore
 
+    // ===================================
     // ADAPTER
+    // ===================================
+
     private lateinit var adapter:
             NewsAdapter
 
+    // ===================================
     // LIST
+    // ===================================
+
     private val newsList =
         mutableListOf<News>()
+
+    private val filteredList =
+        mutableListOf<News>()
+
+    // ===================================
+    // ON CREATE
+    // ===================================
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,13 +63,177 @@ class NewsActivity : AppCompatActivity() {
             FirebaseFirestore.getInstance()
 
         // SETUP
-        setupBottomNavigation()
-
         setupRecycler()
 
-        setupAddButton()
+        setupSearch()
 
-        loadNews()
+        setupBottomNavigation()
+
+        setupButtons()
+
+
+    }
+    override fun onStart() {
+        super.onStart()
+        loadNews() // Tự động tải lại dữ liệu mới nhất
+    }
+
+    // ===================================
+    // BUTTONS
+    // ===================================
+
+    private fun setupButtons() {
+
+        // ADD BLOG
+        binding.btnAddBlog
+            .setOnClickListener {
+
+                startActivity(
+
+                    Intent(
+                        this,
+                        AddNewsActivity::class.java
+                    )
+                )
+            }
+    }
+
+    // ===================================
+    // RECYCLER
+    // ===================================
+
+    private fun setupRecycler() {
+
+        adapter =
+            NewsAdapter(filteredList)
+
+        binding.recyclerNews.layoutManager =
+            LinearLayoutManager(this)
+
+        binding.recyclerNews.adapter =
+            adapter
+    }
+
+    // ===================================
+    // FIREBASE
+    // ===================================
+
+    private fun loadNews() {
+
+        firestore.collection("news")
+            .get()
+
+            .addOnSuccessListener { documents ->
+
+                newsList.clear()
+
+                filteredList.clear()
+
+                for (document in documents) {
+
+                    val news =
+                        document.toObject(
+                            News::class.java
+                        )
+
+                    news.id =
+                        document.id
+
+                    newsList.add(news)
+                }
+
+                filteredList.addAll(
+                    newsList
+                )
+
+                adapter.notifyDataSetChanged()
+            }
+
+            .addOnFailureListener {
+
+                Toast.makeText(
+                    this,
+                    "Không tải được blogs",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+    }
+
+    // ===================================
+    // SEARCH
+    // ===================================
+
+    private fun setupSearch() {
+
+        binding.edtSearchNews
+            .addTextChangedListener(
+
+                object : TextWatcher {
+
+                    override fun beforeTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        count: Int,
+                        after: Int
+                    ) {
+
+                    }
+
+                    override fun onTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        before: Int,
+                        count: Int
+                    ) {
+
+                        filterNews(
+                            s.toString()
+                        )
+                    }
+
+                    override fun afterTextChanged(
+                        s: Editable?
+                    ) {
+
+                    }
+                }
+            )
+    }
+
+    // ===================================
+    // FILTER
+    // ===================================
+
+    private fun filterNews(
+        keyword: String
+    ) {
+
+        filteredList.clear()
+
+        for (news in newsList) {
+
+            if (
+
+                news.title
+                    .lowercase()
+                    .contains(
+                        keyword.lowercase()
+                    )
+
+                ||
+
+                news.category
+                    .lowercase()
+                    .contains(
+                        keyword.lowercase()
+                    )
+            ) {
+
+                filteredList.add(news)
+            }
+        }
+
+        adapter.notifyDataSetChanged()
     }
 
     // ===================================
@@ -121,78 +306,6 @@ class NewsActivity : AppCompatActivity() {
 
                     else -> false
                 }
-            }
-    }
-
-    // ===================================
-    // RECYCLER VIEW
-    // ===================================
-
-    private fun setupRecycler() {
-
-        adapter =
-            NewsAdapter(newsList)
-
-        binding.recyclerNews.layoutManager =
-            LinearLayoutManager(this)
-
-        binding.recyclerNews.adapter =
-            adapter
-    }
-
-    // ===================================
-    // LOAD FIREBASE
-    // ===================================
-
-    private fun loadNews() {
-
-        firestore.collection("news")
-            .get()
-
-            .addOnSuccessListener { documents ->
-
-                newsList.clear()
-
-                for (document in documents) {
-
-                    val news =
-                        document.toObject(
-                            News::class.java
-                        )
-
-                    newsList.add(news)
-                }
-
-                adapter.notifyDataSetChanged()
-            }
-
-            .addOnFailureListener {
-
-                Toast.makeText(
-                    this,
-                    "Không thể tải blogs",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-    }
-
-    // ===================================
-    // ADD BLOG
-    // ===================================
-
-    private fun setupAddButton() {
-
-        binding.btnAddBlog
-            .setOnClickListener {
-
-                Toast.makeText(
-                    this,
-                    "Thêm blog mới",
-                    Toast.LENGTH_SHORT
-                ).show()
-
-                // TODO:
-                // OPEN ADD BLOG SCREEN
             }
     }
 }

@@ -39,6 +39,19 @@
         <activity android:name=".ChatActivity" android:exported="false" />
         <activity android:name=".NewsActivity" android:exported="false" />
         <activity android:name=".NewsDetailActivity" android:exported="false" />
+        <activity android:name=".AddNewsActivity" android:exported="false"/>
+        <activity android:name=".AddBillActivity" android:exported="false"/>
+        <activity android:name=".PropertyHomeDetailActivity" android:exported="false" />
+        <activity android:name=".ViewAssetActivity" android:exported="false" />
+        <activity android:name=".RepairManagementActivity" android:exported="false" />
+        <activity android:name=".HandoverManagementActivity" android:exported="false" />
+        <activity android:name=".TenantHandoverActivity" android:exported="false" />
+        <activity android:name=".SendRepairActivity" android:exported="false" />
+        <activity android:name=".RentedRoomsActivity" android:exported="false" />
+        <activity android:name=".AssetDashboardActivity" android:exported="false" />
+        <activity android:name=".NotificationListActivity" android:exported="false" />
+        <activity android:name=".SettingsActivity" android:exported="false" />
+        <activity android:name=".TenantBillActivity" android:exported="false" />
 
     </application>
 

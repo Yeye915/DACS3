@@ -8,11 +8,9 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dacs3.databinding.ActivityMainBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlin.jvm.java
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,8 +18,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
 
-    private val propertyList =
-        mutableListOf<Property>()
+    private val handler = Handler(Looper.getMainLooper())
+    private lateinit var bannerRunnable: Runnable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,147 +30,213 @@ class MainActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
-        // 1. Cài đặt các thành phần giao diện
+        // 1. Cài đặt thành phần giao diện cố định
         setupBanner()
-        setupHouseRecyclerView()
 
-        // 2. Xử lý logic người dùng và Navigation
-        fetchUserRoleAndSetupFeatures()
+        // 2. Xử lý logic điều hướng Top Bar và Bottom Nav
         setupNavigationAndClicks()
-
-
-
     }
 
-    override fun onResume() {
-        super.onResume()
-        val sharedPref = getSharedPreferences("AppPrefs", MODE_PRIVATE)
-        val role = sharedPref.getString("user_role", "seeker")
+    override fun onStart() {
+        super.onStart()
+        // Đọc Online trực tiếp từ Firestore để cập nhật chính xác Tiện ích và Ô thống kê số lượng phòng
+        fetchUserRoleAndSetupFeatures()
+    }
+
+    private fun updateStatistics(role: String) {
+        if (!::binding.isInitialized || binding.cardStatistics == null) return
+        val currentUserUid = auth.currentUser?.uid
 
         if (role == "host") {
-            binding.btnContractWallet.text = "Ví hợp đồng (Chủ nhà)"
-            binding.btnContractWallet.setOnClickListener {
-                // Chuyển sang trang ví của chủ nhà
-                val intent = Intent(this, HostWalletActivity::class.java)
-                startActivity(intent)
+            binding.txtStatLabel1.text = "Đã thuê"
+            binding.txtStatLabel2.text = "Chưa thuê"
+
+            if (currentUserUid != null) {
+                // Đếm số phòng ĐÃ THUÊ của chính chủ nhà này
+                db.collection("properties")
+                    .whereEqualTo("hostUid", currentUserUid)
+                    .whereEqualTo("status", "Đã thuê")
+                    .addSnapshotListener { snapshots, _ ->
+                        binding.txtStatValue1.text = (snapshots?.size() ?: 0).toString()
+                    }
+
+                // Đếm số phòng TRỐNG của chính chủ nhà này
+                db.collection("properties")
+                    .whereEqualTo("hostUid", currentUserUid)
+                    .whereEqualTo("status", "Trống")
+                    .addSnapshotListener { snapshots, _ ->
+                        binding.txtStatValue2.text = (snapshots?.size() ?: 0).toString()
+                    }
             }
         } else {
-            binding.btnContractWallet.text = "Ví hợp đồng (Người thuê)"
-            binding.btnContractWallet.setOnClickListener {
-                // Chuyển sang trang ví của người thuê
-                val intent = Intent(this, TenantWalletActivity::class.java)
-                startActivity(intent)
-            }
+            // VAI TRÒ NGƯỜI THUÊ
+            binding.txtStatLabel1.text = "Phòng trống"
+            binding.txtStatLabel2.text = "Khu vực"
+
+            // Đếm tổng số phòng trống trên toàn bộ hệ thống
+            db.collection("properties")
+                .whereEqualTo("status", "Trống")
+                .addSnapshotListener { snapshots, _ ->
+                    binding.txtStatValue1.text = (snapshots?.size() ?: 0).toString()
+                }
+
+            // GIẢI PHÁP AN TOÀN: Lấy toàn bộ phòng về và đếm xem có bao nhiêu phòng ở Đà Nẵng
+            db.collection("properties")
+                .addSnapshotListener { snapshots, _ ->
+                    var danangCount = 0
+                    if (snapshots != null) {
+                        for (doc in snapshots) {
+                            val rentalAddress = doc.getString("rental") ?: ""
+                            val cityField = doc.getString("city") ?: ""
+                            // Nếu địa chỉ chứa chữ "Lê Độ" hoặc "Đà Nẵng" thì tự động tính vào khu vực Đà Nẵng
+                            if (cityField == "Đà Nẵng" || rentalAddress.lowercase().contains("lê độ")) {
+                                danangCount++
+                            }
+                        }
+                    }
+                    binding.txtStatValue2.text = "Đà Nẵng ($danangCount)"
+                }
         }
     }
 
-
     private fun setupNavigationAndClicks() {
-        // Mặc định mục Trang chủ sáng đèn
         binding.bottomNav.selectedItemId = R.id.nav_home
 
-        // Xử lý sự kiện Bottom Navigation
         binding.bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_home -> true // Đang ở Home rồi, không làm gì cả
+                R.id.nav_home -> true
                 R.id.nav_rooms -> {
-                    // Nếu Nhi đã có PropertyActivity thì mở nó ra nhé
                     startActivity(Intent(this, PropertyActivity::class.java))
                     overridePendingTransition(0, 0)
-                    finish() // Đóng MainActivity để giải phóng bộ nhớ
+                    finish()
                     true
                 }
-
                 R.id.nav_blog -> {
                     startActivity(Intent(this, NewsActivity::class.java))
                     overridePendingTransition(0, 0)
                     finish()
                     true
                 }
-
                 R.id.nav_profile -> {
                     startActivity(Intent(this, ProfileActivity::class.java))
                     overridePendingTransition(0, 0)
                     finish()
-                    true}
+                    true
+                }
                 else -> false
             }
         }
 
-        // Click listeners cho Top Bar
         binding.tvTopRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
-
-
+        binding.tvTopLogin.setOnClickListener {
+            startActivity(Intent(this, LoginActivity::class.java))
+        }
     }
 
     private fun fetchUserRoleAndSetupFeatures() {
         val currentUser = auth.currentUser
-
-        val allFeatures = listOf(
-            Feature(1, "Hóa Đơn", android.R.drawable.ic_dialog_map),
-            Feature(2, "Quản Lý Tài Sản", android.R.drawable.ic_menu_myplaces),
-            Feature(3, "Thống Kê", android.R.drawable.ic_menu_sort_by_size),
-            Feature(4, "Sự Cố Và Sửa Chữa", android.R.drawable.ic_menu_agenda),
-            Feature(5, "Bàn Giao Tài Sản Số", android.R.drawable.ic_dialog_alert),
-            Feature(6, "Ví Hợp Đồng", android.R.drawable.ic_menu_preferences)
-        )
+        val sharedPref = getSharedPreferences("AppPrefs", MODE_PRIVATE)
 
         if (currentUser != null) {
             binding.tvTopLogin.visibility = View.GONE
             binding.tvTopRegister.visibility = View.GONE
             binding.tvUserNameTop.visibility = View.VISIBLE
 
+            // ĐỌC ONLINE: Đảm bảo đăng nhập nick nào là nhảy giao diện tiện ích nick đó ngay lập tức
             db.collection("Users").document(currentUser.uid).get()
                 .addOnSuccessListener { document ->
                     if (document != null && document.exists()) {
                         val userName = document.getString("fullName") ?: "Người dùng"
                         binding.tvUserNameTop.text = " $userName"
+
+                        val role = document.getString("role") ?: "seeker"
+                        sharedPref.edit().putString("user_role", role).apply()
+
+                        setupFeaturesLayout(role)
+                        updateStatistics(role)
                     }
-                    renderRecyclerView(allFeatures)
                 }
                 .addOnFailureListener {
-                    renderRecyclerView(allFeatures)
+                    val localRole = sharedPref.getString("user_role", "seeker") ?: "seeker"
+                    setupFeaturesLayout(localRole)
+                    updateStatistics(localRole)
                 }
         } else {
             binding.tvTopLogin.visibility = View.VISIBLE
             binding.tvTopRegister.visibility = View.VISIBLE
             binding.tvUserNameTop.visibility = View.GONE
-            renderRecyclerView(allFeatures)
+
+            val localRole = sharedPref.getString("user_role", "seeker") ?: "seeker"
+            setupFeaturesLayout(localRole)
+            updateStatistics(localRole)
         }
     }
 
-    private fun setupHouseRecyclerView() {
-        val sampleHouses = listOf(
-            House(1, "Phòng trọ gác xép mới xây", "Gần đại học VKU, Đà Nẵng", "1.500.000 VNĐ/tháng", R.drawable.background),
-            House(2, "Căn hộ mini Full nội thất", "Đường Trần Đại Nghĩa, Đà Nẵng", "2.800.000 VNĐ/tháng", R.drawable.background1),
-            House(3, "Phòng trọ giá rẻ cho sinh viên", "Khu dân cư Nam cầu Cẩm Lệ", "1.200.000 VNĐ/tháng", R.drawable.background2)
-        )
-
-        val adapter = HouseAdapter(sampleHouses) { selectedHouse ->
-            Toast.makeText(this, "Bạn đang xem: ${selectedHouse.title}", Toast.LENGTH_SHORT).show()
+    private fun setupFeaturesLayout(role: String) {
+        val features = if (role == "host") {
+            listOf(
+                Feature(1, "Tạo Hóa Đơn", android.R.drawable.ic_menu_add),
+                Feature(2, "Quản Lý Tài Sản", android.R.drawable.ic_menu_myplaces),
+                Feature(3, "Xem Phòng", android.R.drawable.ic_menu_sort_by_size),
+                Feature(4, "Yêu Cầu Sửa Chữa", android.R.drawable.ic_menu_agenda),
+                Feature(5, "Bàn Giao Phòng", android.R.drawable.ic_dialog_alert)
+            )
+        } else {
+            listOf(
+                Feature(1, "Hóa Đơn Của Tôi", android.R.drawable.ic_dialog_email),
+                Feature(2, "Xem Phòng Đã Thuê", android.R.drawable.ic_menu_myplaces),
+                Feature(3, "Khám Phá Phòng Trống", android.R.drawable.ic_menu_sort_by_size),
+                Feature(4, "Báo Cáo Sự Cố", android.R.drawable.ic_menu_agenda),
+                Feature(5, "Nhận Bàn Giao", android.R.drawable.ic_dialog_alert)
+            )
         }
-
-        binding.rvHouses.layoutManager = LinearLayoutManager(this)
-        binding.rvHouses.adapter = adapter
+        renderRecyclerView(features, role)
     }
 
-    private fun renderRecyclerView(features: List<Feature>) {
+    private fun renderRecyclerView(features: List<Feature>, role: String) {
         val adapter = FeatureAdapter(features) { selectedFeature ->
             when (selectedFeature.id) {
-                6 -> { // ID của Ví Hợp Đồng là 6
-                    val sharedPref = getSharedPreferences("AppPrefs", MODE_PRIVATE)
-                    val role = sharedPref.getString("user_role", "seeker")
-
+                1 -> {
                     if (role == "host") {
-                        startActivity(Intent(this, HostWalletActivity::class.java))
+                        startActivity(Intent(this, AddBillActivity::class.java))
                     } else {
-                        startActivity(Intent(this, TenantWalletActivity::class.java))
+                        // NGƯỜI THUÊ: Kích hoạt mở trang xem hóa đơn thực tế
+                        startActivity(Intent(this, TenantBillActivity::class.java))
+                    }
+                }
+                2 -> {
+                    if (role == "host") {
+                        // THAY THẾ DIALOG CŨ: Mở thẳng màn hình quản lý tổng thể tài sản sang trọng
+                        startActivity(Intent(this, AssetDashboardActivity::class.java))
+                    } else {
+                        // NGƯỜI THUÊ: Mở trang xem danh sách phòng trọ đã thuê thực tế
+                        startActivity(Intent(this, RentedRoomsActivity::class.java))
+                    }
+                }
+
+                3 -> {
+                    startActivity(Intent(this, PropertyActivity::class.java))
+                }
+                4 -> {
+                    if (role == "host") {
+                        startActivity(Intent(this, RepairManagementActivity::class.java))
+                    } else {
+                        // NGƯỜI THUÊ: Kích hoạt mở trang gửi báo cáo sự cố lên Firebase thực tế
+                        startActivity(Intent(this, SendRepairActivity::class.java))
+                    }
+                }
+                5 -> {
+                    if (role == "host") {
+                        startActivity(Intent(this, HandoverManagementActivity::class.java))
+                    } else {
+                        // NGƯỜI THUÊ: Mở trang nhận bàn giao phòng online thực tế
+                        startActivity(Intent(this, TenantHandoverActivity::class.java))
                     }
                 }
                 else -> {
-                    Toast.makeText(this, "Bạn chọn: ${selectedFeature.title}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Tính năng: ${selectedFeature.title}", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -184,15 +248,23 @@ class MainActivity : AppCompatActivity() {
         val bannerImages = listOf(R.drawable.background, R.drawable.background1, R.drawable.background2, R.drawable.background3)
         binding.viewPagerBanner.adapter = BannerAdapter(bannerImages)
 
-        val handler = Handler(Looper.getMainLooper())
-        val runnable = object : Runnable {
+        bannerRunnable = object : Runnable {
             override fun run() {
-                val currentItem = binding.viewPagerBanner.currentItem
-                val nextItem = if (currentItem == bannerImages.size - 1) 0 else currentItem + 1
-                binding.viewPagerBanner.setCurrentItem(nextItem, true)
-                handler.postDelayed(this, 3000)
+                if (::binding.isInitialized && binding.viewPagerBanner != null) {
+                    val currentItem = binding.viewPagerBanner.currentItem
+                    val nextItem = if (currentItem == bannerImages.size - 1) 0 else currentItem + 1
+                    binding.viewPagerBanner.setCurrentItem(nextItem, true)
+                    handler.postDelayed(this, 3000)
+                }
             }
         }
-        handler.postDelayed(runnable, 3000)
+        handler.postDelayed(bannerRunnable, 3000)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (::bannerRunnable.isInitialized) {
+            handler.removeCallbacks(bannerRunnable)
+        }
     }
 }

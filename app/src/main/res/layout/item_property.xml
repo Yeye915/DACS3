@@ -84,10 +84,10 @@
                 android:id="@+id/btnChat"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
-                android:text="Chat"
-                android:textColor="#FFFFFF"
                 android:layout_marginTop="8dp"
-                android:backgroundTint="#6A1B9A"/>
+                android:backgroundTint="@color/itro_green"
+                android:text="Chat"
+                android:textColor="#FFFFFF" />
 
             <!-- Info -->
             <LinearLayout
