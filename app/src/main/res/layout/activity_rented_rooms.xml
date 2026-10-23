@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8F9FA">
+
+    <!-- TOP BAR -->
+    <LinearLayout
+        android:id="@+id/topBarRented"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/itro_green"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:elevation="4dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/ic_menu_revert"
+            app:tint="@color/white" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Phòng Đang Thuê Của Tôi"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- LIST PHÒNG ĐÃ THUÊ -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvRentedRooms"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/topBarRented"
+        android:padding="8dp"
+        android:clipToPadding="false" />
+
+    <!-- TEXT THÔNG BÁO RỖNG -->
+    <TextView
+        android:id="@+id/tvEmptyRented"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="Bạn chưa thuê căn phòng nào trên hệ thống 🏠"
+        android:textColor="#888888"
+        android:textSize="15sp"
+        android:visibility="gone" />
+
+</RelativeLayout>
