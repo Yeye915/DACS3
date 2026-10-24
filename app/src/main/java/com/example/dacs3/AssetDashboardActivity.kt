@@ -5,12 +5,11 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dacs3.databinding.ActivityAssetDashboardBinding
 import com.google.firebase.firestore.FirebaseFirestore
 
-class AssetDashboardActivity : AppCompatActivity() {
+class AssetDashboardActivity : HouseActivity() {
 
     private lateinit var binding: ActivityAssetDashboardBinding
     private val db = FirebaseFirestore.getInstance()

@@ -1,91 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA">
-
+    android:background="@color/background">
     <LinearLayout
         android:id="@+id/topBarSendRepair"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="@color/itro_green"
+        android:layout_height="72dp"
+        android:background="@color/background"
         android:gravity="center_vertical"
         android:paddingHorizontal="16dp"
-        android:elevation="4dp">
-
+        android:elevation="0dp">
         <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/ic_menu_revert"
-            app:tint="@color/white" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="Báo Cáo Sự Cố Phòng"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/topBarSendRepair"
-        android:orientation="vertical"
-        android:padding="20dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tên phòng trọ của bạn"
-            android:textColor="#333333"
-            android:textStyle="bold"
-            android:textSize="14sp" />
-
-        <EditText
-            android:id="@+id/edtRepairRoom"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="20dp"
-            android:background="@android:drawable/edit_text"
-            android:hint="Ví dụ: Phòng 302 - Nhà 4 tầng"
-            android:paddingHorizontal="12dp"
-            android:textSize="14sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Mô tả chi tiết sự cố hư hỏng"
-            android:textColor="#333333"
-            android:textStyle="bold"
-            android:textSize="14sp" />
-
-        <EditText
-            android:id="@+id/edtRepairDescription"
-            android:layout_width="match_parent"
-            android:layout_height="120dp"
-            android:layout_marginTop="8dp"
-            android:background="@android:drawable/edit_text"
-            android:gravity="top|start"
-            android:hint="Mô tả tình trạng (vđ: Vòi nước nhà vệ sinh bị rỉ nước liên tục, hỏng công tắc điện...)"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_ui_back"
+            app:tint="@color/text_primary"
             android:padding="12dp"
-            android:textSize="14sp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnSubmitRepair"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:layout_marginTop="30dp"
-            android:backgroundTint="@color/itro_green"
-            android:text="GỬI BÁO CÁO CHO CHỦ NHÀ 🚀"
-            android:textColor="@color/white"
+            android:contentDescription="@string/action_back" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="Báo cáo sự cố"
+            android:textColor="@color/text_primary"
+            android:textSize="20sp"
             android:textStyle="bold"
-            app:cornerRadius="10dp" />
-
+            android:fontFamily="sans-serif-medium"
+            android:layout_weight="1"
+            android:maxLines="2"
+            android:ellipsize="end" />
     </LinearLayout>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/topBarSendRepair"
+        android:fillViewport="true">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tên phòng trọ của bạn"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:labelFor="@id/edtRepairRoom" />
+            <EditText
+                android:id="@+id/edtRepairRoom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/bg_input_field"
+                android:hint="Ví dụ: Phòng 302 - Nhà 4 tầng"
+                android:paddingHorizontal="12dp"
+                android:textSize="14sp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary"
+                android:minHeight="56dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mô tả chi tiết sự cố hư hỏng"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:labelFor="@id/edtRepairDescription" />
+            <EditText
+                android:id="@+id/edtRepairDescription"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_input_field"
+                android:gravity="top|start"
+                android:hint="Mô tả tình trạng (vđ: Vòi nước nhà vệ sinh bị rỉ nước liên tục, hỏng công tắc điện...)"
+                android:padding="12dp"
+                android:textSize="14sp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSubmitRepair"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:backgroundTint="@color/itro_green"
+                android:text="Gửi báo cáo cho chủ nhà"
+                android:textColor="@color/on_primary"
+                android:textStyle="bold"
+                app:cornerRadius="16dp"
+                android:textAllCaps="false"
+                android:minHeight="52dp" />
+        </LinearLayout>
+    </ScrollView>
 </RelativeLayout>

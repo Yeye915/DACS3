@@ -1,54 +1,150 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA">
-
+    android:background="@color/background">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
-
+        android:padding="24dp">
+        <ImageView
+            style="@style/Widget.House.IconButton"
+            android:id="@+id/btnBackAuth"
+            android:src="@drawable/ic_ui_back"
+            android:contentDescription="@string/action_back"
+            android:layout_marginBottom="24dp" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TẠO HÓA ĐƠN MỚI"
-            android:textSize="20sp"
+            android:text="Tạo hóa đơn mới"
+            android:textSize="26sp"
             android:textStyle="bold"
-            android:textColor="@color/itro_green"
-            android:layout_gravity="center"
-            android:layout_marginBottom="20dp"/>
-
-        <TextView android:text="Tên nhà / phòng trọ:" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-        <EditText android:id="@+id/edtBillRoomName" android:layout_width="match_parent" android:layout_height="50dp" android:enabled="false" android:background="#E9ECEF" android:padding="10dp" android:layout_marginBottom="12dp"/>
-
-        <TextView android:text="Địa chỉ phòng:" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-        <EditText android:id="@+id/edtBillAddress" android:layout_width="match_parent" android:layout_height="50dp" android:enabled="false" android:background="#E9ECEF" android:padding="10dp" android:layout_marginBottom="12dp"/>
-
-        <TextView android:text="Giá thuê gốc (đ/tháng):" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-        <EditText android:id="@+id/edtBillRoomPrice" android:layout_width="match_parent" android:layout_height="50dp" android:enabled="false" android:background="#E9ECEF" android:padding="10dp" android:layout_marginBottom="12dp"/>
-
-        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#DDDDDD" android:layout_marginVertical="10dp"/>
-
-        <TextView android:text="Tháng xuất hóa đơn (vđ: 06/2026):" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-        <EditText android:id="@+id/edtBillMonth" android:layout_width="match_parent" android:layout_height="50dp" android:hint="Nhập tháng" android:padding="10dp" android:layout_marginBottom="12dp"/>
-
-        <TextView android:text="Tiền Điện phát sinh (đ):" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-        <EditText android:id="@+id/edtBillElectricity" android:layout_width="match_parent" android:layout_height="50dp" android:hint="Nhập số tiền điện" android:inputType="number" android:padding="10dp" android:layout_marginBottom="12dp"/>
-
-        <TextView android:text="Tiền Nước phát sinh (đ):" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-        <EditText android:id="@+id/edtBillWater" android:layout_width="match_parent" android:layout_height="50dp" android:hint="Nhập số tiền nước" android:inputType="number" android:padding="10dp" android:layout_marginBottom="20dp"/>
-
+            android:textColor="@color/text_primary"
+            android:layout_marginBottom="20dp"
+            android:textAppearance="@style/TextAppearance.House.Title" />
+        <TextView
+            android:text="Tên nhà / phòng trọ:"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/edtBillRoomName" />
+        <EditText
+            android:id="@+id/edtBillRoomName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:background="@drawable/bg_input_field"
+            android:padding="10dp"
+            android:layout_marginBottom="12dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:minHeight="56dp" />
+        <TextView
+            android:text="Địa chỉ phòng:"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/edtBillAddress" />
+        <EditText
+            android:id="@+id/edtBillAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:background="@drawable/bg_input_field"
+            android:padding="10dp"
+            android:layout_marginBottom="12dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:minHeight="56dp" />
+        <TextView
+            android:text="Giá thuê gốc (đ/tháng):"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/edtBillRoomPrice" />
+        <EditText
+            android:id="@+id/edtBillRoomPrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:background="@drawable/bg_input_field"
+            android:padding="10dp"
+            android:layout_marginBottom="12dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:minHeight="56dp" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/outline"
+            android:layout_marginVertical="10dp" />
+        <TextView
+            android:text="Tháng xuất hóa đơn (vđ: 06/2026):"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/edtBillMonth" />
+        <EditText
+            android:id="@+id/edtBillMonth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nhập tháng"
+            android:padding="10dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/bg_input_field"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:minHeight="56dp" />
+        <TextView
+            android:text="Tiền Điện phát sinh (đ):"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/edtBillElectricity" />
+        <EditText
+            android:id="@+id/edtBillElectricity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nhập số tiền điện"
+            android:inputType="number"
+            android:padding="10dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/bg_input_field"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:minHeight="56dp" />
+        <TextView
+            android:text="Tiền Nước phát sinh (đ):"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/edtBillWater" />
+        <EditText
+            android:id="@+id/edtBillWater"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nhập số tiền nước"
+            android:inputType="number"
+            android:padding="10dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/bg_input_field"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:minHeight="56dp" />
         <Button
             android:id="@+id/btnSubmitBill"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
+            android:layout_height="wrap_content"
             android:backgroundTint="@color/itro_green"
-            android:text="XÁC NHẬN XUẤT HÓA ĐƠN"
-            android:textColor="@color/white"
+            android:text="Xác nhận xuất hóa đơn"
+            android:textColor="@color/on_primary"
             android:textStyle="bold"
-            android:textSize="16sp"/>
+            android:textSize="16sp"
+            android:textAllCaps="false"
+            app:cornerRadius="16dp"
+            android:minHeight="52dp" />
     </LinearLayout>
 </ScrollView>

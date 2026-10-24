@@ -6,12 +6,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.example.dacs3.databinding.ActivityProfileBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class ProfileActivity : AppCompatActivity() {
+class ProfileActivity : HouseActivity() {
 
     private lateinit var binding: ActivityProfileBinding
     private val auth = FirebaseAuth.getInstance()
@@ -23,6 +22,13 @@ class ProfileActivity : AppCompatActivity() {
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val signedIn = auth.currentUser != null
+        binding.toggleRoleGroup.visibility = if (signedIn) View.VISIBLE else View.GONE
+        binding.btnEditAvatar.visibility = if (signedIn) View.VISIBLE else View.GONE
+        binding.tvProfileSubtitle.setText(if (signedIn) R.string.profile_description else R.string.profile_guest_description)
+        binding.btnGuestLogin.visibility = if (signedIn) View.GONE else View.VISIBLE
+        binding.btnLogout.visibility = if (signedIn) View.VISIBLE else View.GONE
+        binding.btnGuestLogin.setOnClickListener { startActivity(Intent(this, LoginActivity::class.java)) }
         loadUserData()
         setupBottomNavigation()
         setupRoleToggle()
@@ -42,8 +48,11 @@ class ProfileActivity : AppCompatActivity() {
         }
         binding.btnPersonalInfo.setOnClickListener {
             // Lệnh chuyển sang trang EditProfileActivity
-            val intent = Intent(this, EditProfileActivity::class.java)
+            val intent = Intent(this, if (auth.currentUser == null) LoginActivity::class.java else EditProfileActivity::class.java)
             startActivity(intent)
+        }
+        binding.btnMessages.setOnClickListener {
+            startActivity(Intent(this, if (auth.currentUser == null) LoginActivity::class.java else ChatActivity::class.java))
         }
         // Kết nối nút hỗ trợ với trang AI mới
         binding.btnSupport.setOnClickListener {
@@ -80,7 +89,7 @@ class ProfileActivity : AppCompatActivity() {
         db.collection("Users").document(uid).get()
             .addOnSuccessListener { doc ->
                 if (doc.exists()) {
-                    binding.tvProfileName.text = doc.getString("fullName") ?: "Nhi"
+                    binding.tvProfileName.text = doc.getString("fullName") ?: getString(R.string.profile_title)
                 }
             }
     }
@@ -121,6 +130,7 @@ class ProfileActivity : AppCompatActivity() {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
             val imageUri: Uri? = data?.data
             if (imageUri != null) {
+                binding.ivAvatar.setPadding(0, 0, 0, 0)
                 binding.ivAvatar.setImageURI(imageUri)
                 Toast.makeText(this, "Đã cập nhật ảnh đại diện", Toast.LENGTH_SHORT).show()
             }

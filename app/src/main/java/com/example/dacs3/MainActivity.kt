@@ -2,24 +2,19 @@ package com.example.dacs3
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.dacs3.databinding.ActivityMainBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : HouseActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
 
-    private val handler = Handler(Looper.getMainLooper())
-    private lateinit var bannerRunnable: Runnable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,16 +25,15 @@ class MainActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
-        // 1. Cài đặt thành phần giao diện cố định
-        setupBanner()
-
         // 2. Xử lý logic điều hướng Top Bar và Bottom Nav
         setupNavigationAndClicks()
     }
 
     override fun onStart() {
         super.onStart()
-        // Đọc Online trực tiếp từ Firestore để cập nhật chính xác Tiện ích và Ô thống kê số lượng phòng
+        val cachedRole = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+            .getString("user_role", "seeker") ?: "seeker"
+        setupFeaturesLayout(cachedRole)
         fetchUserRoleAndSetupFeatures()
     }
 
@@ -56,7 +50,7 @@ class MainActivity : AppCompatActivity() {
                 db.collection("properties")
                     .whereEqualTo("hostUid", currentUserUid)
                     .whereEqualTo("status", "Đã thuê")
-                    .addSnapshotListener { snapshots, _ ->
+                    .addSnapshotListener(this) { snapshots, _ ->
                         binding.txtStatValue1.text = (snapshots?.size() ?: 0).toString()
                     }
 
@@ -64,7 +58,7 @@ class MainActivity : AppCompatActivity() {
                 db.collection("properties")
                     .whereEqualTo("hostUid", currentUserUid)
                     .whereEqualTo("status", "Trống")
-                    .addSnapshotListener { snapshots, _ ->
+                    .addSnapshotListener(this) { snapshots, _ ->
                         binding.txtStatValue2.text = (snapshots?.size() ?: 0).toString()
                     }
             }
@@ -76,13 +70,13 @@ class MainActivity : AppCompatActivity() {
             // Đếm tổng số phòng trống trên toàn bộ hệ thống
             db.collection("properties")
                 .whereEqualTo("status", "Trống")
-                .addSnapshotListener { snapshots, _ ->
+                .addSnapshotListener(this) { snapshots, _ ->
                     binding.txtStatValue1.text = (snapshots?.size() ?: 0).toString()
                 }
 
             // GIẢI PHÁP AN TOÀN: Lấy toàn bộ phòng về và đếm xem có bao nhiêu phòng ở Đà Nẵng
             db.collection("properties")
-                .addSnapshotListener { snapshots, _ ->
+                .addSnapshotListener(this) { snapshots, _ ->
                     var danangCount = 0
                     if (snapshots != null) {
                         for (doc in snapshots) {
@@ -100,6 +94,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupNavigationAndClicks() {
+        binding.btnExploreRooms.setOnClickListener {
+            startActivity(Intent(this, PropertyActivity::class.java))
+        }
+        binding.btnHomeSupport.setOnClickListener {
+            startActivity(Intent(this, ChatAIActivity::class.java))
+        }
         binding.bottomNav.selectedItemId = R.id.nav_home
 
         binding.bottomNav.setOnItemSelectedListener { item ->
@@ -165,7 +165,11 @@ class MainActivity : AppCompatActivity() {
                 }
         } else {
             binding.tvTopLogin.visibility = View.VISIBLE
-            binding.tvTopRegister.visibility = View.VISIBLE
+            // Keep the brand and login reachable on narrow screens with large text.
+            // Registration is also available from the login screen.
+            val compactHeader = resources.configuration.fontScale > 1.15f &&
+                resources.configuration.screenWidthDp < 360
+            binding.tvTopRegister.visibility = if (compactHeader) View.GONE else View.VISIBLE
             binding.tvUserNameTop.visibility = View.GONE
 
             val localRole = sharedPref.getString("user_role", "seeker") ?: "seeker"
@@ -177,19 +181,19 @@ class MainActivity : AppCompatActivity() {
     private fun setupFeaturesLayout(role: String) {
         val features = if (role == "host") {
             listOf(
-                Feature(1, "Tạo Hóa Đơn", android.R.drawable.ic_menu_add),
-                Feature(2, "Quản Lý Tài Sản", android.R.drawable.ic_menu_myplaces),
-                Feature(3, "Xem Phòng", android.R.drawable.ic_menu_sort_by_size),
-                Feature(4, "Yêu Cầu Sửa Chữa", android.R.drawable.ic_menu_agenda),
-                Feature(5, "Bàn Giao Phòng", android.R.drawable.ic_dialog_alert)
+                Feature(1, "Tạo hóa đơn", R.drawable.ic_ui_receipt),
+                Feature(2, "Quản lý tài sản", R.drawable.ic_ui_assets),
+                Feature(3, "Danh sách phòng", R.drawable.ic_ui_home),
+                Feature(4, "Yêu cầu sửa chữa", R.drawable.ic_ui_repair),
+                Feature(5, "Bàn giao phòng", R.drawable.ic_ui_key)
             )
         } else {
             listOf(
-                Feature(1, "Hóa Đơn Của Tôi", android.R.drawable.ic_dialog_email),
-                Feature(2, "Xem Phòng Đã Thuê", android.R.drawable.ic_menu_myplaces),
-                Feature(3, "Khám Phá Phòng Trống", android.R.drawable.ic_menu_sort_by_size),
-                Feature(4, "Báo Cáo Sự Cố", android.R.drawable.ic_menu_agenda),
-                Feature(5, "Nhận Bàn Giao", android.R.drawable.ic_dialog_alert)
+                Feature(1, "Hóa đơn của tôi", R.drawable.ic_ui_receipt),
+                Feature(2, "Phòng đang thuê", R.drawable.ic_ui_home),
+                Feature(3, "Khám phá phòng", R.drawable.ic_ui_explore),
+                Feature(4, "Báo cáo sự cố", R.drawable.ic_ui_repair),
+                Feature(5, "Nhận bàn giao", R.drawable.ic_ui_key)
             )
         }
         renderRecyclerView(features, role)
@@ -240,31 +244,13 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        binding.rvFeatures.layoutManager = GridLayoutManager(this, 2)
+        binding.rvFeatures.layoutManager = GridLayoutManager(this, 2).apply {
+            spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                override fun getSpanSize(position: Int) =
+                    if (features.size % 2 == 1 && position == features.lastIndex) 2 else 1
+            }
+        }
         binding.rvFeatures.adapter = adapter
     }
 
-    private fun setupBanner() {
-        val bannerImages = listOf(R.drawable.background, R.drawable.background, R.drawable.background2, R.drawable.background3)
-        binding.viewPagerBanner.adapter = BannerAdapter(bannerImages)
-
-        bannerRunnable = object : Runnable {
-            override fun run() {
-                if (::binding.isInitialized && binding.viewPagerBanner != null) {
-                    val currentItem = binding.viewPagerBanner.currentItem
-                    val nextItem = if (currentItem == bannerImages.size - 1) 0 else currentItem + 1
-                    binding.viewPagerBanner.setCurrentItem(nextItem, true)
-                    handler.postDelayed(this, 3000)
-                }
-            }
-        }
-        handler.postDelayed(bannerRunnable, 3000)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if (::bannerRunnable.isInitialized) {
-            handler.removeCallbacks(bannerRunnable)
-        }
-    }
 }

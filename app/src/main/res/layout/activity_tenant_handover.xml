@@ -1,36 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA">
-
+    android:background="@color/background">
     <LinearLayout
         android:id="@+id/topBarTenantHandover"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="@color/itro_green"
+        android:layout_height="72dp"
+        android:background="@color/background"
         android:gravity="center_vertical"
         android:paddingHorizontal="16dp"
-        android:elevation="4dp">
-
+        android:elevation="0dp">
         <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/ic_menu_revert"
-            app:tint="@color/white" />
-
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_ui_back"
+            app:tint="@color/text_primary"
+            android:padding="12dp"
+            android:contentDescription="@string/action_back" />
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="Nhận Bàn Giao Phòng"
-            android:textColor="@color/white"
+            android:layout_marginStart="12dp"
+            android:text="Nhận bàn giao"
+            android:textColor="@color/text_primary"
             android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            android:layout_weight="1"
+            android:maxLines="2"
+            android:ellipsize="end" />
     </LinearLayout>
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvTenantHandovers"
         android:layout_width="match_parent"
@@ -38,15 +41,18 @@
         android:layout_below="@id/topBarTenantHandover"
         android:padding="8dp"
         android:clipToPadding="false" />
-
     <TextView
         android:id="@+id/tvEmptyTenantHandover"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="Bạn không có biên bản bàn giao nào chờ ký 📝"
-        android:textColor="#888888"
+        android:text="Bạn không có biên bản bàn giao nào chờ ký"
+        android:textColor="@color/text_secondary"
         android:textSize="15sp"
-        android:visibility="gone" />
-
+        android:visibility="gone"
+        android:padding="28dp"
+        android:gravity="center"
+        android:drawableTop="@drawable/illustration_home"
+        android:drawablePadding="16dp"
+        android:accessibilityLiveRegion="polite" />
 </RelativeLayout>

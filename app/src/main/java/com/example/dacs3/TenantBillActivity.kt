@@ -2,13 +2,12 @@ package com.example.dacs3
 
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dacs3.databinding.ActivityTenantBillBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class TenantBillActivity : AppCompatActivity() {
+class TenantBillActivity : HouseActivity() {
 
     private lateinit var binding: ActivityTenantBillBinding
     private val db = FirebaseFirestore.getInstance()

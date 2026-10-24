@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="8dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="2dp">
-
+    app:cardCornerRadius="18dp"
+    app:cardElevation="0dp"
+    style="@style/Widget.House.Card"
+    app:cardBackgroundColor="@color/surface">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="12dp">
-
         <TextView
             android:id="@+id/txtAssetName"
             android:layout_width="wrap_content"
@@ -21,45 +22,50 @@
             android:textColor="@color/itro_green"
             android:textStyle="bold"
             android:textSize="16sp" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="8dp"
             android:weightSum="3">
-
             <EditText
                 android:id="@+id/edtAssetQuantity"
                 android:layout_width="0dp"
-                android:layout_height="45dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="SL"
                 android:inputType="number"
                 android:background="@drawable/bg_input_field"
                 android:paddingHorizontal="8dp"
-                android:textSize="14sp"/>
-
+                android:textSize="14sp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary"
+                android:minHeight="56dp" />
             <EditText
                 android:id="@+id/edtAssetStatus"
                 android:layout_width="0dp"
-                android:layout_height="45dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:layout_marginStart="8dp"
                 android:hint="Tình trạng (Mới/Tốt...)"
                 android:background="@drawable/bg_input_field"
                 android:paddingHorizontal="8dp"
-                android:textSize="14sp"/>
+                android:textSize="14sp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary"
+                android:minHeight="56dp" />
         </LinearLayout>
-
         <EditText
             android:id="@+id/edtAssetNote"
             android:layout_width="match_parent"
-            android:layout_height="45dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:hint="Ghi chú hỏng hóc (nếu có)"
             android:background="@drawable/bg_input_field"
             android:paddingHorizontal="8dp"
-            android:textSize="14sp"/>
+            android:textSize="14sp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:minHeight="56dp" />
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

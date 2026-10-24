@@ -1,52 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F7FA">
-
+    android:background="@color/background">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
-
+        android:padding="24dp">
+        <ImageView
+            style="@style/Widget.House.IconButton"
+            android:id="@+id/btnBackAuth"
+            android:src="@drawable/ic_ui_back"
+            android:contentDescription="@string/action_back"
+            android:layout_marginBottom="24dp" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Quản Lý Chi Tiết Phòng"
-            android:textColor="@color/itro_green"
-            android:textSize="22sp"
-            android:textStyle="bold" />
-
-        <androidx.cardview.widget.CardView
+            android:textColor="@color/text_primary"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textAppearance="@style/TextAppearance.House.Title" />
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="2dp">
-
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp"
+            style="@style/Widget.House.Card"
+            app:cardBackgroundColor="@color/surface">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="16dp">
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Thông tin cơ bản"
                     android:textStyle="bold"
-                    android:layout_marginBottom="12dp"/>
-
+                    android:layout_marginBottom="12dp"
+                    android:labelFor="@id/edtRoomCode" />
                 <EditText
                     android:id="@+id/edtRoomCode"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
+                    android:layout_height="wrap_content"
                     android:hint="Mã phòng (VD: P101)"
                     android:background="@drawable/bg_input_field"
-                    android:paddingHorizontal="12dp"/>
-
+                    android:paddingHorizontal="12dp"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_secondary"
+                    android:minHeight="56dp" />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -55,91 +62,95 @@
                     <EditText
                         android:id="@+id/edtPrice"
                         android:layout_width="0dp"
-                        android:layout_height="50dp"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginEnd="5dp"
                         android:hint="Giá thuê"
                         android:inputType="number"
                         android:background="@drawable/bg_input_field"
-                        android:paddingHorizontal="12dp"/>
+                        android:paddingHorizontal="12dp"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_secondary"
+                        android:minHeight="56dp" />
                     <EditText
                         android:id="@+id/edtMaxPeople"
                         android:layout_width="0dp"
-                        android:layout_height="50dp"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginStart="5dp"
                         android:hint="Số người tối đa"
                         android:inputType="number"
                         android:background="@drawable/bg_input_field"
-                        android:paddingHorizontal="12dp"/>
+                        android:paddingHorizontal="12dp"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_secondary"
+                        android:minHeight="56dp" />
                 </LinearLayout>
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Trạng thái phòng"
-                    android:layout_marginTop="12dp"/>
-
+                    android:layout_marginTop="12dp" />
                 <Spinner
                     android:id="@+id/spinnerStatus"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:layout_marginTop="5dp"
                     android:background="@drawable/bg_input_field" />
-
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:orientation="horizontal"
             android:gravity="center_vertical">
-
             <EditText
                 android:id="@+id/edtCustomAssetName"
                 android:layout_width="0dp"
-                android:layout_height="45dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/bg_input_field"
                 android:hint="Nhập thêm đồ dùng khác..."
                 android:paddingHorizontal="12dp"
-                android:textSize="14sp"/>
-
+                android:textSize="14sp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary"
+                android:minHeight="56dp" />
             <Button
                 android:id="@+id/btnAddCustomAsset"
                 android:layout_width="wrap_content"
-                android:layout_height="45dp"
+                android:layout_height="48dp"
                 android:layout_marginStart="8dp"
                 android:backgroundTint="@color/itro_green"
                 android:text="Thêm"
-                android:textSize="13sp"/>
+                android:textSize="13sp"
+                android:textAllCaps="false"
+                app:cornerRadius="16dp" />
         </LinearLayout>
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Danh mục tài sản"
             android:layout_marginTop="24dp"
             android:textStyle="bold"
-            android:textSize="18sp"/>
-
+            android:textSize="18sp" />
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvAssetList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:nestedScrollingEnabled="false"/>
-
+            android:nestedScrollingEnabled="false" />
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSaveAll"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
             android:layout_marginBottom="24dp"
-            android:text="LƯU TẤT CẢ THÔNG TIN"
+            android:text="Lưu tất cả thông tin"
             android:backgroundTint="@color/itro_green"
-            app:cornerRadius="12dp" />
-
+            app:cornerRadius="16dp"
+            android:textAllCaps="false"
+            android:minHeight="52dp" />
     </LinearLayout>
 </ScrollView>

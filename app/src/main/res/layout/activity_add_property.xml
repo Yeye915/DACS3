@@ -4,38 +4,42 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
-
+    android:background="@color/background">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
-
+        android:padding="24dp">
+        <ImageView
+            style="@style/Widget.House.IconButton"
+            android:id="@+id/btnBackAuth"
+            android:src="@drawable/ic_ui_back"
+            android:contentDescription="@string/action_back"
+            android:layout_marginBottom="24dp" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Thêm nhà mới"
-            android:textColor="@color/itro_green"
-            android:textSize="28sp"
-            android:textStyle="bold" />
-
-        <androidx.cardview.widget.CardView
+            android:textColor="@color/text_primary"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textAppearance="@style/TextAppearance.House.Title" />
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_marginTop="20dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp">
-
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp"
+            style="@style/Widget.House.Card"
+            app:cardBackgroundColor="@color/surface">
             <ImageView
                 android:id="@+id/imgSelected"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:background="#F5F5F5"
+                android:background="@color/background"
                 android:src="@drawable/ic_house2" />
-        </androidx.cardview.widget.CardView>
-
+        </com.google.android.material.card.MaterialCardView>
         <Button
             android:id="@+id/btnSelectImage"
             style="@style/Widget.MaterialComponents.Button.TextButton"
@@ -43,87 +47,100 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="Thay đổi ảnh minh họa"
-            android:textColor="@color/itro_green" />
-
+            android:textColor="@color/itro_green"
+            android:textAllCaps="false"
+            app:cornerRadius="16dp" />
         <EditText
             android:id="@+id/edtTitle"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:hint="Tên nhà / Tiêu đề"
             android:background="@drawable/bg_input_field"
-            android:paddingHorizontal="15dp" />
-
+            android:paddingHorizontal="15dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:minHeight="56dp" />
         <EditText
             android:id="@+id/edtPrice"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:hint="Giá thuê (VNĐ/tháng)"
             android:inputType="number"
             android:background="@drawable/bg_input_field"
-            android:paddingHorizontal="15dp" />
-
+            android:paddingHorizontal="15dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:minHeight="56dp" />
         <EditText
             android:id="@+id/edtLocation"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:hint="Địa chỉ chi tiết"
             android:background="@drawable/bg_input_field"
-            android:paddingHorizontal="15dp" />
-
+            android:paddingHorizontal="15dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:minHeight="56dp" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="12dp"
             android:weightSum="2">
-
             <EditText
                 android:id="@+id/edtBedroom"
                 android:layout_width="0dp"
-                android:layout_height="55dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="5dp"
                 android:hint="Phòng ngủ"
                 android:inputType="number"
                 android:background="@drawable/bg_input_field"
-                android:paddingHorizontal="15dp" />
-
+                android:paddingHorizontal="15dp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary"
+                android:minHeight="56dp" />
             <EditText
                 android:id="@+id/edtBathroom"
                 android:layout_width="0dp"
-                android:layout_height="55dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="5dp"
                 android:hint="Phòng tắm"
                 android:inputType="number"
                 android:background="@drawable/bg_input_field"
-                android:paddingHorizontal="15dp" />
+                android:paddingHorizontal="15dp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary"
+                android:minHeight="56dp" />
         </LinearLayout>
-
         <EditText
             android:id="@+id/edtArea"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:hint="Diện tích (m2)"
             android:inputType="number"
             android:background="@drawable/bg_input_field"
-            android:paddingHorizontal="15dp" />
-
+            android:paddingHorizontal="15dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:minHeight="56dp" />
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAddProperty"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:layout_marginBottom="20dp"
             android:backgroundTint="@color/itro_green"
-            android:text="XÁC NHẬN THÊM NHÀ"
+            android:text="Xác nhận thêm nhà"
             android:textSize="16sp"
             android:textStyle="bold"
-            app:cornerRadius="12dp" />
-
+            app:cornerRadius="16dp"
+            android:textAllCaps="false"
+            android:minHeight="52dp" />
     </LinearLayout>
 </ScrollView>

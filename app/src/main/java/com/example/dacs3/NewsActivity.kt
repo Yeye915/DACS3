@@ -2,310 +2,101 @@ package com.example.dacs3
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dacs3.databinding.ActivityNewsBinding
 import com.google.firebase.firestore.FirebaseFirestore
 
-class NewsActivity : AppCompatActivity() {
-
-    // ===================================
-    // VIEW BINDING
-    // ===================================
-
-    private lateinit var binding:
-            ActivityNewsBinding
-
-    // ===================================
-    // FIREBASE
-    // ===================================
-
-    private lateinit var firestore:
-            FirebaseFirestore
-
-    // ===================================
-    // ADAPTER
-    // ===================================
-
-    private lateinit var adapter:
-            NewsAdapter
-
-    // ===================================
-    // LIST
-    // ===================================
-
-    private val newsList =
-        mutableListOf<News>()
-
-    private val filteredList =
-        mutableListOf<News>()
-
-    // ===================================
-    // ON CREATE
-    // ===================================
+class NewsActivity : HouseActivity() {
+    private lateinit var binding: ActivityNewsBinding
+    private val articles = mutableListOf<News>()
+    private val filtered = mutableListOf<News>()
+    private val adapter = NewsAdapter(filtered)
+    private var loading = true
+    private var loadFailed = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // BINDING
-        binding =
-            ActivityNewsBinding.inflate(
-                layoutInflater
-            )
-
+        binding = ActivityNewsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // FIREBASE
-        firestore =
-            FirebaseFirestore.getInstance()
-
-        // SETUP
-        setupRecycler()
-
-        setupSearch()
-
-        setupBottomNavigation()
-
-        setupButtons()
-
-
+        binding.recyclerNews.layoutManager = LinearLayoutManager(this)
+        binding.recyclerNews.adapter = adapter
+        binding.edtSearchNews.doOnTextChanged { _, _, _, _ -> filterNews() }
+        binding.btnAddBlog.setOnClickListener { startActivity(Intent(this, AddNewsActivity::class.java)) }
+        binding.btnRetry.setOnClickListener {
+            if (!binding.edtSearchNews.text.isNullOrBlank()) binding.edtSearchNews.text.clear()
+            else loadNews()
+        }
+        binding.bottomNav.selectedItemId = R.id.nav_blog
+        binding.bottomNav.setOnItemSelectedListener { item ->
+            val destination = when (item.itemId) {
+                R.id.nav_home -> MainActivity::class.java
+                R.id.nav_rooms -> PropertyActivity::class.java
+                R.id.nav_profile -> ProfileActivity::class.java
+                else -> null
+            }
+            if (destination != null) {
+                startActivity(Intent(this, destination))
+                overridePendingTransition(0, 0)
+                finish()
+            }
+            true
+        }
     }
+
     override fun onStart() {
         super.onStart()
-        loadNews() // Tự động tải lại dữ liệu mới nhất
+        loadNews()
     }
-
-    // ===================================
-    // BUTTONS
-    // ===================================
-
-    private fun setupButtons() {
-
-        // ADD BLOG
-        binding.btnAddBlog
-            .setOnClickListener {
-
-                startActivity(
-
-                    Intent(
-                        this,
-                        AddNewsActivity::class.java
-                    )
-                )
-            }
-    }
-
-    // ===================================
-    // RECYCLER
-    // ===================================
-
-    private fun setupRecycler() {
-
-        adapter =
-            NewsAdapter(filteredList)
-
-        binding.recyclerNews.layoutManager =
-            LinearLayoutManager(this)
-
-        binding.recyclerNews.adapter =
-            adapter
-    }
-
-    // ===================================
-    // FIREBASE
-    // ===================================
 
     private fun loadNews() {
-
-        firestore.collection("news")
-            .get()
-
+        loading = true
+        loadFailed = false
+        renderState()
+        FirebaseFirestore.getInstance().collection("news").get()
             .addOnSuccessListener { documents ->
-
-                newsList.clear()
-
-                filteredList.clear()
-
-                for (document in documents) {
-
-                    val news =
-                        document.toObject(
-                            News::class.java
-                        )
-
-                    news.id =
-                        document.id
-
-                    newsList.add(news)
+                if (isDestroyed) return@addOnSuccessListener
+                loading = false
+                articles.clear()
+                documents.forEach { document ->
+                    articles.add(document.toObject(News::class.java).apply { id = document.id })
                 }
-
-                filteredList.addAll(
-                    newsList
-                )
-
-                adapter.notifyDataSetChanged()
+                filterNews()
             }
-
             .addOnFailureListener {
-
-                Toast.makeText(
-                    this,
-                    "Không tải được blogs",
-                    Toast.LENGTH_SHORT
-                ).show()
+                if (isDestroyed) return@addOnFailureListener
+                loading = false
+                loadFailed = true
+                filterNews()
             }
     }
 
-    // ===================================
-    // SEARCH
-    // ===================================
-
-    private fun setupSearch() {
-
-        binding.edtSearchNews
-            .addTextChangedListener(
-
-                object : TextWatcher {
-
-                    override fun beforeTextChanged(
-                        s: CharSequence?,
-                        start: Int,
-                        count: Int,
-                        after: Int
-                    ) {
-
-                    }
-
-                    override fun onTextChanged(
-                        s: CharSequence?,
-                        start: Int,
-                        before: Int,
-                        count: Int
-                    ) {
-
-                        filterNews(
-                            s.toString()
-                        )
-                    }
-
-                    override fun afterTextChanged(
-                        s: Editable?
-                    ) {
-
-                    }
-                }
-            )
-    }
-
-    // ===================================
-    // FILTER
-    // ===================================
-
-    private fun filterNews(
-        keyword: String
-    ) {
-
-        filteredList.clear()
-
-        for (news in newsList) {
-
-            if (
-
-                news.title
-                    .lowercase()
-                    .contains(
-                        keyword.lowercase()
-                    )
-
-                ||
-
-                news.category
-                    .lowercase()
-                    .contains(
-                        keyword.lowercase()
-                    )
-            ) {
-
-                filteredList.add(news)
-            }
-        }
-
+    private fun filterNews() {
+        val query = binding.edtSearchNews.text.toString().trim()
+        filtered.clear()
+        filtered.addAll(articles.filter {
+            it.title.contains(query, ignoreCase = true) || it.category.contains(query, ignoreCase = true)
+        })
         adapter.notifyDataSetChanged()
+        renderState()
     }
 
-    // ===================================
-    // BOTTOM NAVIGATION
-    // ===================================
-
-    private fun setupBottomNavigation() {
-
-        binding.bottomNav.selectedItemId =
-            R.id.nav_blog
-
-        binding.bottomNav
-            .setOnItemSelectedListener { item ->
-
-                when (item.itemId) {
-
-                    // HOME
-                    R.id.nav_home -> {
-
-                        startActivity(
-
-                            Intent(
-                                this,
-                                MainActivity::class.java
-                            )
-                        )
-
-                        overridePendingTransition(0, 0)
-
-                        true
-                    }
-
-                    // PROPERTY
-                    R.id.nav_rooms -> {
-
-                        startActivity(
-
-                            Intent(
-                                this,
-                                PropertyActivity::class.java
-                            )
-                        )
-
-                        overridePendingTransition(0, 0)
-
-                        true
-                    }
-
-                    // BLOG
-                    R.id.nav_blog -> {
-
-                        true
-                    }
-
-                    // PROFILE
-                    R.id.nav_profile -> {
-
-                        startActivity(
-
-                            Intent(
-                                this,
-                                ProfileActivity::class.java
-                            )
-                        )
-
-                        overridePendingTransition(0, 0)
-
-                        true
-                    }
-
-                    else -> false
-                }
-            }
+    private fun renderState() {
+        val searching = !binding.edtSearchNews.text.isNullOrBlank()
+        binding.loadingIndicator.isVisible = loading && articles.isEmpty()
+        binding.emptyState.isVisible = !loading && filtered.isEmpty()
+        binding.recyclerNews.isVisible = filtered.isNotEmpty()
+        binding.emptyTitle.setText(when {
+            loadFailed -> R.string.connection_empty_title
+            searching -> R.string.search_empty_title
+            else -> R.string.news_empty_title
+        })
+        binding.emptyDescription.setText(when {
+            loadFailed -> R.string.connection_empty_body
+            searching -> R.string.search_empty_body
+            else -> R.string.news_empty_body
+        })
+        binding.btnRetry.setText(if (searching) R.string.action_clear_search else R.string.action_retry)
     }
 }

@@ -6,14 +6,13 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.dacs3.databinding.ActivityPropertyDetailBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class PropertyDetailActivity : AppCompatActivity() {
+class PropertyDetailActivity : HouseActivity() {
 
     private lateinit var binding: ActivityPropertyDetailBinding
     private lateinit var adapter: CommentAdapter

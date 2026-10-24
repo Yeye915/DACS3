@@ -3,14 +3,13 @@ package com.example.dacs3
 import android.app.AlertDialog
 import android.os.Bundle
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope // Dùng cái này thay cho MainScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dacs3.databinding.ActivityChatAiBinding // Import này rất quan trọng
 import com.google.ai.client.generativeai.GenerativeModel
 import kotlinx.coroutines.launch
 
-class ChatAIActivity : AppCompatActivity() {
+class ChatAIActivity : HouseActivity() {
     // Nếu dòng này vẫn đỏ, hãy xem bước 3 bên dưới
     private lateinit var binding: ActivityChatAiBinding
     private val chatList = mutableListOf<ChatMessage>()
@@ -26,6 +25,9 @@ class ChatAIActivity : AppCompatActivity() {
         // Nếu dòng này đỏ, hãy đảm bảo tên file XML của Nhi là activity_chat_ai.xml
         binding = ActivityChatAiBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.toolbarChat.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
+        binding.btnSuggestRoom.setOnClickListener { suggestQuestion(getString(R.string.chat_suggestion_room)) }
+        binding.btnSuggestContract.setOnClickListener { suggestQuestion(getString(R.string.chat_suggestion_contract)) }
 
         // Thiết lập RecyclerView
         chatAdapter = ChatAdapter(chatList)
@@ -36,6 +38,7 @@ class ChatAIActivity : AppCompatActivity() {
             val prompt = binding.etMessage.text.toString().trim()
             if (prompt.isNotEmpty()) {
                 // 1. Thêm tin nhắn của Nhi vào list
+                binding.welcomeCard.visibility = android.view.View.GONE
                 chatList.add(ChatMessage(prompt, true))
                 chatAdapter.notifyItemInserted(chatList.size - 1)
                 binding.rvChat.scrollToPosition(chatList.size - 1)
@@ -62,11 +65,20 @@ class ChatAIActivity : AppCompatActivity() {
                 binding.rvChat.scrollToPosition(chatList.size - 1)
 
             } catch (e: Exception) {
-                chatList.add(ChatMessage("Lỗi rồi Nhi ơi: ${e.message}", false))
+                chatList.add(ChatMessage("House chưa thể trả lời lúc này. Bạn thử lại sau nhé.", false))
                 chatAdapter.notifyDataSetChanged()
             }
         }
     }
 
+
+    private fun suggestQuestion(question: String) {
+        binding.etMessage.setText(question)
+        binding.etMessage.setSelection(question.length)
+        binding.etMessage.requestFocus()
+        binding.welcomeCard.visibility = android.view.View.GONE
+        val keyboard = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+        keyboard.showSoftInput(binding.etMessage, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+    }
 
 }

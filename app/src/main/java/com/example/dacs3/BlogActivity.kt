@@ -1,11 +1,10 @@
 package com.example.dacs3
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dacs3.databinding.ActivityBlogBinding
 
-class BlogActivity : AppCompatActivity() {
+class BlogActivity : HouseActivity() {
     private lateinit var binding: ActivityBlogBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {

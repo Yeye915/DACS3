@@ -2,13 +2,12 @@ package com.example.dacs3
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.dacs3.databinding.ActivityNewsDetailBinding
 import com.google.firebase.firestore.FirebaseFirestore
 
-class NewsDetailActivity : AppCompatActivity() {
+class NewsDetailActivity : HouseActivity() {
 
     private lateinit var binding:
             ActivityNewsDetailBinding

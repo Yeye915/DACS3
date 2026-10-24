@@ -46,8 +46,8 @@ class PropertyAdapter(
         // Load hình ảnh nhà/phòng trọ
         Glide.with(holder.itemView.context)
             .load(property.imageUrl)
-            .placeholder(android.R.drawable.ic_menu_gallery)
-            .error(R.drawable.ic_house)
+            .placeholder(R.drawable.illustration_home)
+            .error(R.drawable.illustration_home)
             .into(holder.binding.imgProperty)
 
         // 1. SỰ KIỆN: Xem chi tiết phòng trọ (Đã sửa lỗi đưa startActivity xuống cuối)
@@ -70,6 +70,8 @@ class PropertyAdapter(
             // LUÔN LUÔN GỌI dòng này ở cuối cùng sau khi đã nạp đủ dữ liệu!
             holder.itemView.context.startActivity(intent)
         }
+
+        holder.binding.btnChat.setOnClickListener { holder.itemView.performClick() }
 
         // 2. SỰ KIỆN: Nhấn nút Tạo hóa đơn tiền phòng (Nhi có thể bổ sung nút này vào giao diện nếu là role Chủ nhà)
         // Ví dụ nếu Nhi có nút đặt tên là btnCreateBill trong item_property.xml:

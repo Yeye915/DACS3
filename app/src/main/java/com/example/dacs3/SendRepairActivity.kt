@@ -2,11 +2,10 @@ package com.example.dacs3
 
 import android.os.Bundle
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.example.dacs3.databinding.ActivitySendRepairBinding
 import com.google.firebase.firestore.FirebaseFirestore
 
-class SendRepairActivity : AppCompatActivity() {
+class SendRepairActivity : HouseActivity() {
 
     private lateinit var binding: ActivitySendRepairBinding
     private val db = FirebaseFirestore.getInstance()

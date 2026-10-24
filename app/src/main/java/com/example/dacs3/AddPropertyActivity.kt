@@ -4,7 +4,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import com.example.dacs3.databinding.ActivityAddPropertyBinding
 import com.google.firebase.firestore.FirebaseFirestore
 import okhttp3.*
@@ -15,7 +14,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 
-class AddPropertyActivity : AppCompatActivity() {
+class AddPropertyActivity : HouseActivity() {
     private lateinit var binding: ActivityAddPropertyBinding
     private lateinit var firestore: FirebaseFirestore
 

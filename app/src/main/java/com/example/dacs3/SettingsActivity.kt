@@ -2,11 +2,10 @@ package com.example.dacs3
 
 import android.os.Bundle
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.example.dacs3.databinding.ActivitySettingsBinding
 import com.google.firebase.auth.FirebaseAuth
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : HouseActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
     private val auth = FirebaseAuth.getInstance()

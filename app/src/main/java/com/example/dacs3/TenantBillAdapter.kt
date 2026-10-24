@@ -1,6 +1,5 @@
 package com.example.dacs3
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,11 +32,11 @@ class TenantBillAdapter(
 
         holder.status.text = bill.status
         if (bill.status == "Đã thanh toán") {
-            holder.status.setTextColor(Color.parseColor("#4CAF50"))
-            holder.status.setBackgroundColor(Color.parseColor("#E8F5E9"))
+            holder.status.setTextColor(androidx.core.content.ContextCompat.getColor(holder.itemView.context, R.color.primary))
+            holder.status.setBackgroundColor(androidx.core.content.ContextCompat.getColor(holder.itemView.context, R.color.primary_soft))
         } else {
-            holder.status.setTextColor(Color.parseColor("#FF4B4B"))
-            holder.status.setBackgroundColor(Color.parseColor("#FFEBEE"))
+            holder.status.setTextColor(androidx.core.content.ContextCompat.getColor(holder.itemView.context, R.color.error))
+            holder.status.setBackgroundColor(androidx.core.content.ContextCompat.getColor(holder.itemView.context, R.color.error_soft))
         }
     }
 

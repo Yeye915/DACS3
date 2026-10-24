@@ -1,100 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
-
+    android:background="@color/background">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
-
+        android:padding="24dp">
+        <ImageView
+            style="@style/Widget.House.IconButton"
+            android:id="@+id/btnBackAuth"
+            android:src="@drawable/ic_ui_back"
+            android:contentDescription="@string/action_back"
+            android:layout_marginBottom="24dp" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="CHỈNH SỬA THÔNG TIN"
-            android:textSize="20sp"
+            android:text="Chỉnh sửa thông tin"
+            android:textSize="26sp"
             android:textStyle="bold"
-            android:textColor="@color/itro_green"
-            android:layout_marginBottom="25dp"/>
-
-        <TextView android:text="Họ và tên" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            android:textColor="@color/text_primary"
+            android:layout_marginBottom="25dp"
+            android:textAppearance="@style/TextAppearance.House.Title" />
+        <TextView
+            android:text="Họ và tên"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/etEditName" />
         <EditText
             android:id="@+id/etEditName"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:hint="Nhập họ tên"
             android:background="@drawable/bg_input_field"
             android:padding="10dp"
-            android:layout_marginBottom="15dp"/>
-
-        <TextView android:text="Số điện thoại"
+            android:layout_marginBottom="15dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:minHeight="56dp" />
+        <TextView
+            android:text="Số điện thoại"
             android:textStyle="bold"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:labelFor="@id/etEditPhone" />
         <EditText
             android:id="@+id/etEditPhone"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:hint="Nhập số điện thoại"
             android:inputType="phone"
             android:background="@drawable/bg_input_field"
             android:padding="10dp"
-            android:layout_marginBottom="15dp"/>
-
+            android:layout_marginBottom="15dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:minHeight="56dp" />
         <TextView
             android:text="Email"
             android:textStyle="bold"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
+            android:layout_height="wrap_content"
+            android:labelFor="@id/etEditEmail" />
         <EditText
             android:id="@+id/etEditEmail"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:enabled="true"
-            android:textColor="#333333"
+            android:textColor="@color/text_primary"
             android:inputType="textEmailAddress"
             android:background="@drawable/bg_input_field"
             android:padding="10dp"
-            android:layout_marginBottom="30dp"/>
-
+            android:layout_marginBottom="30dp"
+            android:textColorHint="@color/text_secondary"
+            android:minHeight="56dp" />
         <TextView
             android:text="Đổi mật khẩu (Để trống nếu không đổi)"
             android:textStyle="bold"
             android:textColor="#FF5722"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
+            android:layout_height="wrap_content"
+            android:labelFor="@id/etOldPassword" />
         <EditText
             android:id="@+id/etOldPassword"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:hint="Mật khẩu hiện tại"
             android:inputType="textPassword"
             android:background="@drawable/bg_input_field"
             android:padding="10dp"
-            android:layout_marginTop="10dp"/>
-
+            android:layout_marginTop="10dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:minHeight="56dp" />
         <EditText
             android:id="@+id/etNewPassword"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:hint="Mật khẩu mới"
             android:inputType="textPassword"
             android:background="@drawable/bg_input_field"
             android:padding="10dp"
-            android:layout_marginTop="10dp"/>
-
+            android:layout_marginTop="10dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:minHeight="56dp" />
         <Button
             android:id="@+id/btnSaveProfile"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="LƯU THÔNG TIN"
+            android:layout_height="wrap_content"
+            android:text="Lưu thông tin"
             android:backgroundTint="@color/itro_green"
-            android:textColor="#FFFFFF"
-            android:layout_marginTop="30dp"/>
-
+            android:textColor="@color/on_primary"
+            android:layout_marginTop="30dp"
+            android:textAllCaps="false"
+            app:cornerRadius="16dp"
+            android:minHeight="52dp" />
     </LinearLayout>
 </ScrollView>

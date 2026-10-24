@@ -2,14 +2,13 @@ package com.example.dacs3
 
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dacs3.databinding.ActivityNotificationListBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
-class NotificationListActivity : AppCompatActivity() {
+class NotificationListActivity : HouseActivity() {
 
     private lateinit var binding: ActivityNotificationListBinding
     private val db = FirebaseFirestore.getInstance()

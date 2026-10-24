@@ -1,18 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="4dp">
-
+    app:cardCornerRadius="18dp"
+    app:cardElevation="0dp"
+    style="@style/Widget.House.Card"
+    app:cardBackgroundColor="@color/surface">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp">
-
         <TextView
             android:id="@+id/tvBlogTitle"
             android:layout_width="match_parent"
@@ -21,7 +22,6 @@
             android:textColor="@color/itro_green"
             android:textSize="18sp"
             android:textStyle="bold" />
-
         <TextView
             android:id="@+id/tvBlogDate"
             android:layout_width="wrap_content"
@@ -29,7 +29,6 @@
             android:text="15/05/2026"
             android:textSize="12sp"
             android:layout_marginTop="4dp" />
-
         <TextView
             android:id="@+id/tvBlogSummary"
             android:layout_width="match_parent"
@@ -38,7 +37,6 @@
             android:ellipsize="end"
             android:maxLines="2"
             android:text="Nội dung tóm tắt của bài viết blog sẽ hiển thị ở đây..."
-            android:textColor="#555555" />
-
+            android:textColor="@color/text_secondary" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -4,12 +4,11 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dacs3.databinding.ActivityHandoverManagementBinding
 import com.google.firebase.firestore.FirebaseFirestore
 
-class HandoverManagementActivity : AppCompatActivity() {
+class HandoverManagementActivity : HouseActivity() {
 
     private lateinit var binding: ActivityHandoverManagementBinding
     private val db = FirebaseFirestore.getInstance()

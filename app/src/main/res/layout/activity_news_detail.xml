@@ -1,39 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA">
-
+    android:background="@color/background">
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/layoutInputCommentContainer"
         android:fillViewport="true">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="300dp">
-
+            <FrameLayout android:layout_width="match_parent" android:layout_height="300dp">
                 <ImageView
                     android:id="@+id/imgNews"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/background" />
-
-                <androidx.cardview.widget.CardView
+                    android:src="@drawable/illustration_home" />
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardBack"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_margin="16dp"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="4dp">
+                    app:cardCornerRadius="18dp"
+                    app:cardElevation="0dp"
+                    style="@style/Widget.House.Card"
+                    app:cardBackgroundColor="@color/surface">
                     <ImageView
                         android:id="@+id/btnBack"
                         android:layout_width="match_parent"
@@ -41,24 +37,23 @@
                         android:padding="10dp"
                         android:src="@drawable/ic_close1"
                         app:tint="#333333" />
-                </androidx.cardview.widget.CardView>
+                </com.google.android.material.card.MaterialCardView>
             </FrameLayout>
-
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="-30dp"
-                app:cardCornerRadius="28dp"
-                app:cardElevation="8dp"
-                app:cardPreventCornerOverlap="false">
-
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp"
+                app:cardPreventCornerOverlap="false"
+                style="@style/Widget.House.Card"
+                app:cardBackgroundColor="@color/surface">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="24dp"
                     android:background="@color/white">
-
                     <TextView
                         android:id="@+id/txtCategory"
                         android:layout_width="wrap_content"
@@ -70,24 +65,21 @@
                         android:textColor="@color/itro_green"
                         android:textSize="12sp"
                         android:textStyle="bold" />
-
                     <TextView
                         android:id="@+id/txtTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="14dp"
                         android:text="Tiêu đề bài viết"
-                        android:textColor="#222222"
+                        android:textColor="@color/text_primary"
                         android:textSize="24sp"
                         android:textStyle="bold"
-                        android:lineSpacingMultiplier="1.2"/>
-
+                        android:lineSpacingMultiplier="1.2" />
                     <View
                         android:layout_width="60dp"
                         android:layout_height="4dp"
                         android:layout_marginTop="16dp"
-                        android:background="@color/itro_green"/>
-
+                        android:background="@color/itro_green" />
                     <TextView
                         android:id="@+id/txtDescription"
                         android:layout_width="match_parent"
@@ -97,14 +89,12 @@
                         android:text="Mô tả chi tiết nội dung bài viết..."
                         android:textColor="#444444"
                         android:textSize="15sp" />
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="28dp"
                         android:orientation="horizontal"
                         android:weightSum="2">
-
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnLike"
                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -118,8 +108,8 @@
                             app:icon="@drawable/ic_heart"
                             app:iconTint="#E91E63"
                             app:iconSize="18dp"
-                            app:cornerRadius="12dp" />
-
+                            app:cornerRadius="16dp"
+                            android:textAllCaps="false" />
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnShare"
                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -133,18 +123,17 @@
                             app:icon="@android:drawable/ic_menu_share"
                             app:iconTint="#03A9F4"
                             app:iconSize="18dp"
-                            app:cornerRadius="12dp" />
+                            app:cornerRadius="16dp"
+                            android:textAllCaps="false" />
                     </LinearLayout>
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="32dp"
                         android:text="Bình luận cộng đồng"
-                        android:textColor="#222222"
+                        android:textColor="@color/text_primary"
                         android:textSize="18sp"
                         android:textStyle="bold" />
-
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recyclerComment"
                         android:layout_width="match_parent"
@@ -152,22 +141,20 @@
                         android:layout_marginTop="12dp"
                         android:nestedScrollingEnabled="false" />
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
     <LinearLayout
         android:id="@+id/layoutInputCommentContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="#FFFFFF"
+        android:background="@color/surface"
         android:elevation="16dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
         android:paddingVertical="10dp">
-
         <EditText
             android:id="@+id/edtComment"
             android:layout_width="0dp"
@@ -176,8 +163,9 @@
             android:background="@drawable/bg_input_field"
             android:hint="Viết bình luận công khai..."
             android:paddingHorizontal="16dp"
-            android:textSize="14sp" />
-
+            android:textSize="14sp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary" />
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btnSendComment"
             android:layout_width="wrap_content"
@@ -185,9 +173,9 @@
             android:layout_marginStart="12dp"
             app:fabCustomSize="42dp"
             android:src="@android:drawable/ic_menu_send"
-            app:backgroundTint="@color/itro_green"
-            app:tint="@color/white"
-            app:elevation="0dp"/>
+            app:backgroundTint="@color/primary"
+            app:tint="@color/on_primary"
+            app:elevation="0dp"
+            android:contentDescription="@string/action_add" />
     </LinearLayout>
-
 </RelativeLayout>

@@ -1,113 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA">
-
+    android:background="@color/background">
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/layoutActionButtons"
         android:fillViewport="true">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="280dp">
-
+            <FrameLayout android:layout_width="match_parent" android:layout_height="280dp">
                 <ImageView
                     android:id="@+id/imgProperty"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop" />
-
                 <ImageView
                     android:id="@+id/btnBack"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_gravity="top|start"
                     android:layout_margin="16dp"
-                    android:background="@android:drawable/toast_frame"
-                    android:backgroundTint="#80000000"
-                    android:padding="8dp"
-                    android:src="@android:drawable/ic_menu_revert"
-                    app:tint="@color/white" />
-
+                    android:background="@drawable/bg_icon_button"
+                    android:padding="13dp"
+                    android:src="@drawable/ic_ui_back"
+                    app:tint="@color/primary"
+                    style="@style/Widget.House.IconButton"
+                    android:contentDescription="@string/action_back" />
                 <ImageView
                     android:id="@+id/btnFavorite"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_gravity="top|end"
                     android:layout_margin="16dp"
-                    android:background="@android:drawable/toast_frame"
-                    android:backgroundTint="#80000000"
-                    android:padding="8dp"
-                    android:src="@android:drawable/btn_star_big_off"
-                    app:tint="@color/white" />
+                    android:background="@drawable/bg_icon_button"
+                    android:padding="13dp"
+                    android:src="@drawable/ic_ui_heart"
+                    app:tint="@color/primary"
+                    style="@style/Widget.House.IconButton"
+                    android:contentDescription="Yêu thích phòng" />
             </FrameLayout>
-
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="-20dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginHorizontal="12dp"
                 android:layout_marginBottom="12dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="4dp">
-
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp"
+                style="@style/Widget.House.Card"
+                app:cardBackgroundColor="@color/surface">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
-
                     <TextView
                         android:id="@+id/txtPrice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="1.500.000 VNĐ/tháng"
-                        android:textColor="#E64A19"
-                        android:textSize="24sp"
+                        android:textColor="@color/primary"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
-
                     <TextView
                         android:id="@+id/txtTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="Phòng trọ gác xép mới xây"
-                        android:textColor="#222222"
+                        android:textColor="@color/text_primary"
                         android:textSize="20sp"
-                        android:textStyle="bold" />
-
+                        android:textStyle="bold"
+                        android:textAppearance="@style/TextAppearance.House.Title" />
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
-
                         <ImageView
                             android:layout_width="16dp"
                             android:layout_height="16dp"
                             android:src="@android:drawable/ic_menu_compass"
                             app:tint="#777777" />
-
                         <TextView
                             android:id="@+id/txtLocation"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="6dp"
                             android:text="Gần đại học VKU, Đà Nẵng"
-                            android:textColor="#777777"
+                            android:textColor="@color/text_secondary"
                             android:textSize="14sp" />
                     </LinearLayout>
-
                     <RatingBar
                         android:id="@+id/ratingBar"
                         style="?android:attr/ratingBarStyleSmall"
@@ -117,48 +107,39 @@
                         android:numStars="5"
                         android:progressTint="#FFC107"
                         android:rating="4.5" />
-
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginVertical="14dp"
-                        android:background="#EEEEEE" />
-
+                        android:background="@color/outline" />
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:weightSum="2">
-
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:background="@android:drawable/toast_frame"
-                            android:backgroundTint="#F1F3F5"
+                            android:background="@drawable/bg_icon_button"
                             android:padding="8dp">
                             <TextView
                                 android:id="@+id/txtArea"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Diện tích: 25m²"
-                                android:textColor="#495057"
+                                android:textColor="@color/text_primary"
                                 android:textStyle="bold"
                                 android:textSize="13sp" />
                         </LinearLayout>
-
-                        <View
-                            android:layout_width="12dp"
-                            android:layout_height="match_parent"/>
-
+                        <View android:layout_width="12dp" android:layout_height="match_parent" />
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:background="@android:drawable/toast_frame"
-                            android:backgroundTint="#F1F3F5"
+                            android:background="@drawable/bg_icon_button"
                             android:padding="8dp">
                             <TextView
                                 android:layout_width="wrap_content"
@@ -169,20 +150,17 @@
                                 android:textSize="13sp" />
                         </LinearLayout>
                     </LinearLayout>
-
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
+            </com.google.android.material.card.MaterialCardView>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="12dp"
                 android:text="Đánh giá &amp; Bình luận"
-                android:textColor="#333333"
+                android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold" />
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerComment"
                 android:layout_width="match_parent"
@@ -190,98 +168,104 @@
                 android:layout_marginHorizontal="12dp"
                 android:layout_marginTop="8dp"
                 android:nestedScrollingEnabled="false" />
-
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="12dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="1dp">
-
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp"
+                style="@style/Widget.House.Card"
+                app:cardBackgroundColor="@color/surface">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:padding="8dp"
                     android:gravity="center_vertical">
-
                     <EditText
                         android:id="@+id/edtComment"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:background="@android:color/transparent"
                         android:hint="Viết bình luận cảm nghĩ của bạn..."
                         android:paddingHorizontal="12dp"
-                        android:textSize="14sp" />
-
+                        android:textSize="14sp"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_secondary"
+                        android:minHeight="48dp" />
                     <ImageView
                         android:id="@+id/btnSendComment"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         android:layout_marginEnd="8dp"
-                        android:src="@android:drawable/ic_menu_send"
-                        app:tint="@color/itro_green" />
+                        android:src="@drawable/ic_ui_send"
+                        app:tint="@color/primary"
+                        style="@style/Widget.House.IconButton"
+                        android:padding="13dp"
+                        android:background="@drawable/bg_icon_button"
+                        android:contentDescription="Gửi bình luận" />
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
     </ScrollView>
-
     <LinearLayout
         android:id="@+id/layoutActionButtons"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="#FFFFFF"
-        android:elevation="8dp"
+        android:background="@color/surface"
+        android:elevation="0dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
-        android:weightSum="3">
-
+        android:paddingVertical="12dp">
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnChat"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:backgroundTint="#E8F5E9"
+            android:backgroundTint="@color/primary_soft"
             android:text="Liên hệ"
-            android:textColor="@color/itro_green"
+            android:textColor="@color/primary"
             android:textStyle="bold"
-            app:cornerRadius="10dp"
+            app:cornerRadius="16dp"
             app:strokeColor="@color/itro_green"
-            app:strokeWidth="1dp" />
-
-        <View
-            android:layout_width="12dp"
-            android:layout_height="match_parent" />
-
-        <!-- NÚT 1: THUÊ PHÒNG NGAY (Dành cho Người Thuê) -->
+            app:strokeWidth="1dp"
+            android:textAllCaps="false"
+            android:minHeight="52dp"
+            android:textSize="13sp"
+            android:maxLines="2" />
+        <View android:layout_width="12dp" android:layout_height="match_parent" />
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnRentNow"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:backgroundTint="#FF9800"
-            android:text="Thuê phòng ngay ⚡"
-            android:textColor="#FFFFFF"
+            android:backgroundTint="@color/primary"
+            android:text="Thuê phòng"
+            android:textColor="@color/on_primary"
             android:textStyle="bold"
-            app:cornerRadius="10dp"
-            android:visibility="visible" />
-
-        <!-- NÚT 2: TẠO HÓA ĐƠN MỚI BỔ SUNG (Dành cho Chủ Nhà - Chiếm 2/3 thanh nút bấm) -->
+            app:cornerRadius="16dp"
+            android:visibility="visible"
+            android:textAllCaps="false"
+            android:minHeight="52dp"
+            android:textSize="13sp"
+            android:maxLines="2" />
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCreateBill"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:backgroundTint="@color/itro_green"
-            android:text="Tạo hóa đơn phòng"
-            android:textColor="#FFFFFF"
+            android:backgroundTint="@color/primary"
+            android:text="Tạo hóa đơn"
+            android:textColor="@color/on_primary"
             android:textStyle="bold"
-            app:cornerRadius="10dp"
-            android:visibility="gone" />
-
+            app:cornerRadius="16dp"
+            android:visibility="gone"
+            android:textAllCaps="false"
+            android:minHeight="52dp"
+            android:textSize="13sp"
+            android:maxLines="2" />
     </LinearLayout>
 </RelativeLayout>

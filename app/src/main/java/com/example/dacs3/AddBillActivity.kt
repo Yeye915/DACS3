@@ -4,12 +4,11 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.example.dacs3.databinding.ActivityAddBillBinding
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.DecimalFormat
 
-class AddBillActivity : AppCompatActivity() {
+class AddBillActivity : HouseActivity() {
 
     private lateinit var binding: ActivityAddBillBinding
     private val firestore = FirebaseFirestore.getInstance()

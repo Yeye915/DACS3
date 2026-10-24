@@ -1,12 +1,11 @@
 package com.example.dacs3
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dacs3.databinding.ActivityChatBinding
 import com.google.firebase.firestore.FirebaseFirestore
 
-class ChatActivity : AppCompatActivity() {
+class ChatActivity : HouseActivity() {
 
     private lateinit var binding:
             ActivityChatBinding

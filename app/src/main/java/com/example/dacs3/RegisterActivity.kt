@@ -3,11 +3,10 @@ package com.example.dacs3
 import android.os.Bundle
 import android.util.Patterns
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.example.dacs3.databinding.ActivityRegisterBinding
 import com.google.firebase.auth.FirebaseAuth // 1. Import thư viện Firebase Auth
 
-class RegisterActivity : AppCompatActivity() {
+class RegisterActivity : HouseActivity() {
     private lateinit var binding: ActivityRegisterBinding
     private lateinit var auth: FirebaseAuth // 2. Khai báo biến Firebase Auth
 

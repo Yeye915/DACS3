@@ -1,24 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
     <item
         android:id="@+id/nav_home"
-        android:icon="@drawable/ic_house0"
+        android:icon="@drawable/ic_ui_home"
         android:title="Trang chủ" />
-
     <item
         android:id="@+id/nav_rooms"
-        android:icon="@drawable/ic_house1"
-        android:title="Nhà/phòng" />
-
+        android:icon="@drawable/ic_ui_explore"
+        android:title="Khám phá" />
     <item
         android:id="@+id/nav_blog"
-        android:icon="@drawable/ic_blog"
-        android:title="Blog" />
-
+        android:icon="@drawable/ic_ui_news"
+        android:title="Bảng tin" />
     <item
         android:id="@+id/nav_profile"
-        android:icon="@drawable/ic_person"
-        android:title="Tôi" />
-
+        android:icon="@drawable/ic_ui_person"
+        android:title="Tài khoản" />
 </menu>
