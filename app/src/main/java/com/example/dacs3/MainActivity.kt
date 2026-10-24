@@ -245,7 +245,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupBanner() {
-        val bannerImages = listOf(R.drawable.background, R.drawable.background1, R.drawable.background2, R.drawable.background3)
+        val bannerImages = listOf(R.drawable.background, R.drawable.background, R.drawable.background2, R.drawable.background3)
         binding.viewPagerBanner.adapter = BannerAdapter(bannerImages)
 
         bannerRunnable = object : Runnable {
