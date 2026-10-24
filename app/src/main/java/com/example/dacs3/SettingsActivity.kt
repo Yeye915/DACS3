@@ -8,7 +8,7 @@ import com.google.firebase.auth.FirebaseAuth
 class SettingsActivity : HouseActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
-    private val auth = FirebaseAuth.getInstance()
+    private val auth = Backend.auth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,14 +18,10 @@ class SettingsActivity : HouseActivity() {
         // Nút quay lại màn hình Profile
         binding.btnBack.setOnClickListener { finish() }
 
-        // Bật tắt nhận thông báo đơn giản
-        binding.switchNotification.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                Toast.makeText(this, "Đã bật nhận thông báo hệ thống", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Đã tắt nhận thông báo hệ thống", Toast.LENGTH_SHORT).show()
-            }
-        }
+        val prefs=getSharedPreferences("AppPrefs",MODE_PRIVATE)
+        val key="notifications_${auth.currentUser?.uid ?: "guest"}"
+        binding.switchNotification.isChecked=prefs.getBoolean(key,true)
+        binding.switchNotification.setOnCheckedChangeListener { _,checked -> prefs.edit().putBoolean(key,checked).apply() }
 
         // Click đổi mật khẩu bằng cơ chế gửi link về Email của Firebase Auth cực kỳ an toàn
         binding.btnChangePassword.setOnClickListener {

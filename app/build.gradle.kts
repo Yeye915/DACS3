@@ -21,7 +21,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("boolean", "USE_FIREBASE_EMULATORS", providers.gradleProperty("useFirebaseEmulators").orElse("false").get())
+        }
         release {
+            buildConfigField("boolean", "USE_FIREBASE_EMULATORS", "false")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -36,6 +40,7 @@ android {
 
 
     buildFeatures {
+        buildConfig = true
         viewBinding = true
         dataBinding = true
         compose = true
@@ -66,6 +71,8 @@ dependencies {
     // RecyclerView + CardView
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.cardview:cardview:1.0.0")
+
+    implementation("org.osmdroid:osmdroid-android:6.1.20")
 
     // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")

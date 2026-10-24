@@ -1,65 +1,22 @@
 package com.example.dacs3
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.dacs3.databinding.ActivityRentedRoomsBinding
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-
-class RentedRoomsActivity : HouseActivity() {
-
-    private lateinit var binding: ActivityRentedRoomsBinding
-    private val db = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
-    private val rentedList = mutableListOf<HandoverRequest>()
-    private lateinit var adapter: RentedRoomsAdapter
-
+import android.widget.LinearLayout
+class RentedRoomsActivity : FlowActivity() {
+    private var section: LinearLayout?=null
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityRentedRoomsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        binding.btnBack.setOnClickListener { finish() }
-
-        setupRecyclerView()
-        loadMyRentedRooms()
-    }
-
-    private fun setupRecyclerView() {
-        adapter = RentedRoomsAdapter(rentedList)
-        binding.rvRentedRooms.layoutManager = LinearLayoutManager(this)
-        binding.rvRentedRooms.adapter = adapter
-    }
-
-    private fun loadMyRentedRooms() {
-        val uid = auth.currentUser?.uid ?: return
-
-        // 1. Lấy tên chính chủ người thuê
-        db.collection("Users").document(uid).get()
-            .addOnSuccessListener { userDoc ->
-                val myName = userDoc.getString("fullName") ?: ""
-
-                // 2. Tìm kiếm trong handovers những phòng có tên của họ
-                db.collection("handovers")
-                    .whereEqualTo("tenantName", myName)
-                    .addSnapshotListener { snapshots, _ ->
-                        if (snapshots != null) {
-                            rentedList.clear()
-                            for (doc in snapshots) {
-                                val room = doc.toObject(HandoverRequest::class.java)
-                                room.id = doc.id
-                                rentedList.add(room)
-                            }
-
-                            if (rentedList.isEmpty()) {
-                                binding.tvEmptyRented.visibility = View.VISIBLE
-                            } else {
-                                binding.tvEmptyRented.visibility = View.GONE
-                            }
-                            adapter.notifyDataSetChanged()
-                        }
-                    }
+        super.onCreate(savedInstanceState);screen("Phòng đang thuê","Xem chi tiết, bản đồ và liên hệ chủ nhà.")
+        action("Yêu cầu thuê của tôi") { startActivity(Intent(this,RentalRequestsActivity::class.java)) }
+        if(!requireAccount()) { finish();return }
+        observe(Backend.db.collection("properties").whereEqualTo("tenantUid",Backend.auth.currentUser!!.uid)) { result ->
+            section?.let { body.removeView(it) };section=LinearLayout(this).apply { orientation=1;body.addView(this) }
+            result.documents.map(Property::from).forEach { room ->
+                val c=card(section!!);label(room.title,20f,c);label("${room.address}\n${RentalValidation.format(room.rent)}/tháng",14f,c)
+                action("Xem chi tiết phòng",c) { startActivity(Intent(this,PropertyDetailActivity::class.java).putExtra("CHOSEN_PROPERTY",room)) }
+                action("Xem bản đồ",c) { startActivity(Intent(this,MapActivity::class.java).putExtra("CHOSEN_PROPERTY",room)) }
+                action("Tài sản bàn giao",c) { startActivity(Intent(this,ViewAssetActivity::class.java).putExtra("CHOSEN_PROPERTY",room)) }
             }
+        }
     }
 }

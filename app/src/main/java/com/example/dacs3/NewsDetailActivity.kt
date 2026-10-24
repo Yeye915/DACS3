@@ -12,6 +12,8 @@ class NewsDetailActivity : HouseActivity() {
     private lateinit var binding:
             ActivityNewsDetailBinding
 
+    private val listeners=mutableListOf<com.google.firebase.firestore.ListenerRegistration>()
+
     // COMMENT
     private lateinit var adapter:
             CommentAdapter
@@ -33,7 +35,7 @@ class NewsDetailActivity : HouseActivity() {
         setContentView(binding.root)
 
         firestore =
-            FirebaseFirestore.getInstance()
+            Backend.db
 
         // GET DATA
         val newsId = intent.getStringExtra("newsId")
@@ -72,12 +74,15 @@ class NewsDetailActivity : HouseActivity() {
             finish()
         }
 
-        // LIKE
         binding.btnLike.setOnClickListener {
-
-            binding.btnLike.text =
-                "Đã thích ❤️"
+            if(requireAccount() && newsId!=null) {
+                val like=firestore.collection("news").document(newsId).collection("likes").document(Backend.auth.currentUser!!.uid)
+                binding.btnLike.isEnabled=false
+                firestore.runTransaction { tx -> val exists=tx.get(like).exists();if(exists) tx.delete(like) else tx.set(like,mapOf("userUid" to Backend.auth.currentUser!!.uid));!exists }
+                    .addOnSuccessListener { binding.btnLike.text=if(it) "Đã thích" else "Thích" }.addOnFailureListener(::failure).addOnCompleteListener { binding.btnLike.isEnabled=true }
+            }
         }
+        Backend.auth.currentUser?.uid?.let { uid -> if(newsId!=null) listeners.add(firestore.collection("news").document(newsId).collection("likes").document(uid).addSnapshotListener { doc,_ -> binding.btnLike.text=if(doc?.exists()==true) "Đã thích" else "Thích" }) }
 
         // SHARE
         binding.btnShare.setOnClickListener {
@@ -131,35 +136,33 @@ class NewsDetailActivity : HouseActivity() {
 
     // SEND COMMENT
     private fun sendComment() {
-        val text = binding.edtComment.text.toString().trim()
-        val newsId = intent.getStringExtra("newsId") // Lấy ID bài viết từ Intent
-
-        if (text.isEmpty() || newsId == null) return
-
-        val comment = hashMapOf(
-            "newsId" to newsId, // Lưu ID bài để biết bình luận này của bài nào
-            "username" to "Người dùng",
-            "content" to text,
-            "timestamp" to System.currentTimeMillis()
-        )
-
-        firestore.collection("news_comments").add(comment)
-        binding.edtComment.text.clear()
+        val text=binding.edtComment.text.toString().trim()
+        val id=intent.getStringExtra("newsId") ?: return
+        if(text.isBlank()) return
+        if(text.length>2000) { binding.edtComment.error="Tối đa 2.000 ký tự";return }
+        if(!requireAccount()) return
+        binding.btnSendComment.isEnabled=false
+        val user=Backend.auth.currentUser!!
+        firestore.collection("news_comments").add(mapOf("newsId" to id,"userUid" to user.uid,"username" to (user.displayName ?: "Người dùng"),"content" to text,"timestamp" to System.currentTimeMillis()))
+            .addOnSuccessListener { if(binding.edtComment.text.toString().trim()==text) binding.edtComment.text.clear() }
+            .addOnFailureListener(::failure).addOnCompleteListener { binding.btnSendComment.isEnabled=true }
     }
 
     // LOAD COMMENT
     private fun loadComments() {
-        val newsId = intent.getStringExtra("newsId")
+        val newsId = intent.getStringExtra("newsId") ?: return
 
-        firestore.collection("news_comments")
+        listeners.add(firestore.collection("news_comments")
             .whereEqualTo("newsId", newsId) // CHỈ lấy bình luận của bài này
-            .addSnapshotListener { value, _ ->
+            .addSnapshotListener { value, error ->
+                if(error!=null) { failure(error);return@addSnapshotListener }
                 commentList.clear()
                 value?.forEach { doc ->
                     val comment = doc.toObject(Comment::class.java)
                     commentList.add(comment)
                 }
                 adapter.notifyDataSetChanged()
-            }
+            })
     }
+    override fun onDestroy() { listeners.forEach { it.remove() };super.onDestroy() }
 }

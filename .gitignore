@@ -13,3 +13,11 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Local build and Firebase emulator artifacts
+.kotlin/
+node_modules/
+*-debug.log
+firebase-debug.*.log
+.firebase/
+ui-debug.log

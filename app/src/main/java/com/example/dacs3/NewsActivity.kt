@@ -54,7 +54,7 @@ class NewsActivity : HouseActivity() {
         loading = true
         loadFailed = false
         renderState()
-        FirebaseFirestore.getInstance().collection("news").get()
+        Backend.db.collection("news").get()
             .addOnSuccessListener { documents ->
                 if (isDestroyed) return@addOnSuccessListener
                 loading = false

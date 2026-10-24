@@ -40,15 +40,18 @@ class AssetAdapter(
 
         // Nút tăng số lượng
         holder.btnIncrease.setOnClickListener {
+            if(item.quantity >= 1000) return@setOnClickListener
             item.quantity++
             holder.txtQty.text = item.quantity.toString()
         }
 
         // Nút xóa món đồ ra khỏi danh sách tạm thời
         holder.btnDelete.setOnClickListener {
-            list.removeAt(position)
-            notifyItemRemoved(position)
-            notifyItemRangeChanged(position, list.size)
+            val current=holder.bindingAdapterPosition
+            if(current==RecyclerView.NO_POSITION) return@setOnClickListener
+            list.removeAt(current)
+            notifyItemRemoved(current)
+            notifyItemRangeChanged(current,list.size-current)
         }
     }
 

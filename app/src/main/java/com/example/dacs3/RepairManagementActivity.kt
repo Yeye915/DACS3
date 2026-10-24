@@ -1,71 +1,22 @@
 package com.example.dacs3
 
 import android.os.Bundle
-import android.view.View
-import android.widget.Toast
+import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.dacs3.databinding.ActivityRepairManagementBinding
-import com.google.firebase.firestore.FirebaseFirestore
-
-class RepairManagementActivity : HouseActivity() {
-
-    private lateinit var binding: ActivityRepairManagementBinding
-    private val db = FirebaseFirestore.getInstance()
-    private val repairList = mutableListOf<RepairRequest>()
-    private lateinit var adapter: RepairAdapter
-
+class RepairManagementActivity : FlowActivity() {
+    private var section: LinearLayout?=null
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityRepairManagementBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        binding.btnBack.setOnClickListener { finish() }
-
-        setupRecyclerView()
-        loadRepairRequests()
-    }
-
-    private fun setupRecyclerView() {
-        adapter = RepairAdapter(repairList) { selectedRequest ->
-            showUpdateStatusDialog(selectedRequest)
-        }
-        binding.rvRepairRequests.layoutManager = LinearLayoutManager(this)
-        binding.rvRepairRequests.adapter = adapter
-    }
-
-    private fun loadRepairRequests() {
-        db.collection("repairs")
-            .addSnapshotListener { snapshots, e ->
-                if (snapshots != null) {
-                    repairList.clear()
-                    for (doc in snapshots) {
-                        val request = doc.toObject(RepairRequest::class.java)
-                        request.id = doc.id
-                        repairList.add(request)
-                    }
-
-                    if (repairList.isEmpty()) {
-                        binding.tvEmptyRepair.visibility = View.VISIBLE
-                    } else {
-                        binding.tvEmptyRepair.visibility = View.GONE
-                    }
-                    adapter.notifyDataSetChanged()
+        super.onCreate(savedInstanceState);val host=intent.getBooleanExtra("HOST_MODE",true)
+        screen(if(host) "Xử lý sự cố" else "Tiến độ sửa chữa")
+        if(!requireAccount()) { finish();return }
+        observe(Backend.db.collection("repairs").whereEqualTo(if(host) "hostId" else "tenantUid",Backend.auth.currentUser!!.uid)) { result ->
+            section?.let { body.removeView(it) };section=LinearLayout(this).apply { orientation=1;body.addView(this) }
+            result.documents.sortedByDescending { it.getLong("timestamp") }.forEach { doc ->
+                val c=card(section!!);label(doc.getString("propertyTitle").orEmpty(),20f,c);label(doc.getString("description").orEmpty(),14f,c);label(doc.getString("status").orEmpty(),16f,c)
+                if(host) action("Cập nhật tiến độ",c) { val statuses=arrayOf("Chờ xử lý","Đang sửa","Đã xong")
+                    AlertDialog.Builder(this).setTitle("Trạng thái sửa chữa").setItems(statuses) { _,i -> doc.reference.update("status",statuses[i]).addOnFailureListener(::failure) }.show()
                 }
             }
-    }
-
-    private fun showUpdateStatusDialog(request: RepairRequest) {
-        val statuses = arrayOf("Chờ xử lý", "Đang sửa", "Đã xong")
-        AlertDialog.Builder(this)
-            .setTitle("Cập nhật trạng thái sự cố")
-            .setItems(statuses) { _, which ->
-                val newStatus = statuses[which]
-                db.collection("repairs").document(request.id)
-                    .update("status", newStatus)
-                    .addOnSuccessListener {
-                        Toast.makeText(this, "Đã chuyển thành: $newStatus", Toast.LENGTH_SHORT).show()
-                    }
-            }.show()
+        }
     }
 }

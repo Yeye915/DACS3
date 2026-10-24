@@ -1,69 +1,19 @@
 package com.example.dacs3
 
 import android.os.Bundle
-import android.widget.Toast
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.dacs3.databinding.ActivityViewAssetBinding
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
-
-class ViewAssetActivity : HouseActivity() {
-
-    private lateinit var binding: ActivityViewAssetBinding
-    private lateinit var db: FirebaseFirestore
-    private val savedRoomList = mutableListOf<RoomAssetGroup>()
-    private lateinit var groupAdapter: RoomAssetGroupAdapter // Đổi sang Group Adapter mới
-
+class ViewAssetActivity : FlowActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityViewAssetBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        db = FirebaseFirestore.getInstance()
-
-        // Thiết lập RecyclerView hiển thị theo nhóm phòng
-        groupAdapter = RoomAssetGroupAdapter(savedRoomList)
-        binding.rvViewAssetList.layoutManager = LinearLayoutManager(this)
-        binding.rvViewAssetList.adapter = groupAdapter
-
-        loadAssetsFromFirestore()
+        super.onCreate(savedInstanceState);screen("Tài sản bàn giao","Đối chiếu danh sách này với tài sản thực tế trước khi ký nhận.")
+        if(!requireAccount()) { finish();return }
+        val room=intent.getSerializableExtra("CHOSEN_PROPERTY") as? Property
+        if(room!=null) load(room) else chooseProperty(false,false,::load)
     }
-
-    private fun loadAssetsFromFirestore() {
-        db.collection("PropertyAssets")
-            .orderBy("timestamp", Query.Direction.DESCENDING)
-            .get()
-            .addOnSuccessListener { documents ->
-                savedRoomList.clear()
-                for (document in documents) {
-                    // Đọc mã phòng (nếu lúc lưu Nhi đặt tên field là roomCode hoặc mã phòng tương tự)
-                    // Ở đây mình tạm lấy trường "roomCode", nếu trong hashmap lúc lưu Nhi đặt tên khác thì sửa lại chuỗi này nhé
-                    val roomCode = document.getString("roomCode") ?: document.id // Nếu không tìm thấy field thì lấy tạm ID của Document làm tên phòng
-                    val status = document.getString("status") ?: "Trống"
-
-                    val assetsMap = document.get("assets") as? List<Map<String, Any>>
-                    val assetsOfThisRoom = mutableListOf<Asset>()
-
-                    assetsMap?.forEach { map ->
-                        val asset = Asset(
-                            name = map["name"] as? String ?: "",
-                            quantity = (map["quantity"] as? Long)?.toInt() ?: 0,
-                            status = map["status"] as? String ?: "",
-                            buyDate = map["buyDate"] as? String ?: "",
-                            value = map["value"] as? String ?: "",
-                            note = map["note"] as? String ?: "",
-                            quality = map["quality"] as? String ?: ""
-                        )
-                        assetsOfThisRoom.add(asset)
-                    }
-
-                    // Thêm cả cụm phòng và danh sách tài sản của nó vào list hiển thị
-                    savedRoomList.add(RoomAssetGroup(roomCode, status, assetsOfThisRoom))
-                }
-                groupAdapter.notifyDataSetChanged()
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Lỗi tải dữ liệu: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+    private fun load(room: Property) {
+        label(room.title,20f)
+        observe(Backend.db.collection("assets").whereEqualTo("propertyId",room.id)) { result ->
+            val old=body.findViewWithTag<android.view.View>("assets");if(old!=null) body.removeView(old)
+            val c=card().apply { (parent as android.view.View).tag="assets" }
+            result.documents.forEach { label("${it.getString("assetName")} • ${it.getLong("quantity")} • ${it.getString("condition")}",16f,c) }
+        }
     }
 }

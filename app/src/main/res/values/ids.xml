@@ -4,4 +4,13 @@
     <item name="bottomNav" type="id" />
     <item name="rvFeatures" type="id" />
     <item name="ivBannerItem" type="id" />
+    <item name="roomMap" type="id" />
+    <item name="mapAddress" type="id" />
+    <item name="mapStatus" type="id" />
+    <item name="mapSearch" type="id" />
+    <item name="mapAction" type="id" />
+    <item name="btnViewMap" type="id" />
+    <item name="mapCoordinates" type="id" />
+    <item name="mapLatitude" type="id" />
+    <item name="mapLongitude" type="id" />
 </resources>

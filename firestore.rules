@@ -1,0 +1,190 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signed() { return request.auth != null; }
+    function uid() { return request.auth.uid; }
+    function owner(p) { return p.get('hostId', '') != '' ? p.hostId : p.get('hostUid', ''); }
+    function room(id) { return get(/databases/$(database)/documents/properties/$(id)).data; }
+    function party(d) { return signed() && (d.get('hostId','') == uid() || d.get('tenantUid','') == uid()); }
+    function host() { return signed() && get(/databases/$(database)/documents/Users/$(uid())).data.role == 'host'; }
+    function validRoom(p) {
+      return p.title is string && p.title.size() >= 3 && p.title.size() <= 150
+        && p.location is string && p.location.size() >= 5 && p.location.size() <= 300
+        && p.monthlyPrice is int && p.monthlyPrice > 0 && p.monthlyPrice <= 1000000000000
+        && p.bedroom is int && p.bedroom >= 0 && p.bedroom <= 50
+        && p.bathroom is int && p.bathroom >= 0 && p.bathroom <= 50
+        && p.latitude is number && p.latitude >= -90 && p.latitude <= 90
+        && p.longitude is number && p.longitude >= -180 && p.longitude <= 180
+        && p.area is string && p.area.size() <= 30 && p.imageUrl is string && p.imageUrl.size() <= 2000;
+    }
+    match /Users/{userId} {
+      allow read: if signed() && uid() == userId;
+      allow create: if signed() && uid() == userId
+        && request.resource.data.keys().hasOnly(['fullName','email','phone','role'])
+        && request.resource.data.role in ['host','seeker']
+        && request.resource.data.fullName is string && request.resource.data.fullName.size() >= 2
+        && request.resource.data.fullName.size() <= 100 && request.resource.data.phone is string
+        && request.resource.data.phone.size() >= 8 && request.resource.data.phone.size() <= 20
+        && request.resource.data.email == request.auth.token.email;
+      allow update: if signed() && uid() == userId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['fullName','phone','email','avatarUrl','password'])
+        && !('password' in request.resource.data)
+        && request.resource.data.fullName is string && request.resource.data.fullName.size() >= 2 && request.resource.data.fullName.size() <= 100
+        && request.resource.data.phone is string && request.resource.data.phone.size() >= 8 && request.resource.data.phone.size() <= 20
+        && request.resource.data.email == request.auth.token.email;
+      match /favorites/{propertyId} {
+        allow read, delete: if signed() && uid() == userId;
+        allow create, update: if signed() && uid() == userId
+          && request.resource.data.keys().hasOnly(['propertyId','savedAt']) && request.resource.data.propertyId == propertyId
+          && exists(/databases/$(database)/documents/properties/$(propertyId));
+      }
+    }
+    match /properties/{propertyId} {
+      allow read: if true;
+      allow create: if host() && validRoom(request.resource.data)
+        && request.resource.data.hostId == uid() && request.resource.data.hostUid == uid()
+        && request.resource.data.tenantUid == '' && request.resource.data.status in ['Trống','Đang bảo trì']
+        && request.resource.data.keys().hasOnly(['title','location','rental','price','monthlyPrice','bedroom','bathroom','area','imageUrl','latitude','longitude','hostId','hostUid','tenantUid','status','rating','createdAt','updatedAt']);
+      function editRoom() {
+        return validRoom(request.resource.data) && request.resource.data.hostId == uid() && request.resource.data.hostUid == uid()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title','location','rental','price','monthlyPrice','bedroom','bathroom','area','imageUrl','latitude','longitude','hostId','hostUid','updatedAt','status','maxPeople'])
+          && request.resource.data.get('tenantUid','') == resource.data.get('tenantUid','')
+          && (resource.data.get('tenantUid','') == '' ? request.resource.data.status in ['Trống','Đang bảo trì'] : request.resource.data.status == resource.data.status);
+      }
+      function approveRental() {
+        let id = request.resource.data.rentalRequestId;
+        let before = get(/databases/$(database)/documents/rental_requests/$(id)).data;
+        let after = getAfter(/databases/$(database)/documents/rental_requests/$(id)).data;
+        return resource.data.get('tenantUid','') == '' && resource.data.status == 'Trống'
+          && before.status == 'pending' && after.status == 'accepted'
+          && after.propertyId == propertyId && after.hostId == uid() && after.tenantUid == request.resource.data.tenantUid
+          && request.resource.data.status == 'Đã thuê'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tenantUid','status','rentalRequestId']);
+      }
+      allow update: if signed() && owner(resource.data) == uid() && (editRoom() || approveRental());
+    }
+    match /rental_requests/{requestId} {
+      allow get: if signed() && (!exists(/databases/$(database)/documents/rental_requests/$(requestId)) || party(resource.data));
+      allow list: if party(resource.data);
+      function newRequest(d) {
+        let p = room(d.propertyId);
+        return signed() && d.tenantUid == uid() && d.hostId == owner(p) && d.hostId != uid()
+          && d.hostId != '' && p.status == 'Trống' && p.get('tenantUid','') == ''
+          && requestId == d.propertyId + '~' + uid() && d.roomName == p.title
+          && d.get('tenantName','') is string && d.get('tenantName','').size() <= 100
+          && d.status == 'pending' && d.createdAt == request.time
+          && d.keys().hasOnly(['propertyId','roomName','hostId','tenantUid','tenantName','status','createdAt']);
+      }
+      allow create: if newRequest(request.resource.data);
+      allow update: if signed() && (
+        (resource.data.status in ['rejected','cancelled'] && newRequest(request.resource.data))
+        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','updatedAt']) && resource.data.status == 'pending'
+          && ((uid() == resource.data.tenantUid && request.resource.data.status == 'cancelled')
+            || (uid() == resource.data.hostId && owner(room(resource.data.propertyId)) == uid()
+              && (request.resource.data.status == 'rejected'
+                || (request.resource.data.status == 'accepted'
+                  && getAfter(/databases/$(database)/documents/properties/$(resource.data.propertyId)).data.tenantUid == resource.data.tenantUid
+                  && getAfter(/databases/$(database)/documents/properties/$(resource.data.propertyId)).data.rentalRequestId == requestId
+                  && getAfter(/databases/$(database)/documents/handovers/$(requestId)).data.tenantUid == resource.data.tenantUid))))));
+    }
+    match /handovers/{handoverId} {
+      allow read: if party(resource.data);
+      allow create: if signed() && uid() == request.resource.data.hostId
+        && request.resource.data.requestId == handoverId
+        && request.resource.data.keys().hasOnly(['propertyId','requestId','roomName','hostId','tenantUid','tenantName','assetCheck','completed','createdAt'])
+        && request.resource.data.completed == false
+        && getAfter(/databases/$(database)/documents/rental_requests/$(handoverId)).data.status == 'accepted'
+        && getAfter(/databases/$(database)/documents/rental_requests/$(handoverId)).data.hostId == uid()
+        && getAfter(/databases/$(database)/documents/rental_requests/$(handoverId)).data.propertyId == request.resource.data.propertyId
+        && getAfter(/databases/$(database)/documents/rental_requests/$(handoverId)).data.tenantUid == request.resource.data.tenantUid;
+      allow update: if signed() && uid() == resource.data.tenantUid && resource.data.completed == false
+        && request.resource.data.completed == true && request.resource.data.signedAt == request.time
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['completed','signedAt']);
+    }
+    match /bills/{billId} {
+      allow get: if signed() && (!exists(/databases/$(database)/documents/bills/$(billId)) || party(resource.data));
+      allow list: if party(resource.data);
+      allow create: if signed() && uid() == request.resource.data.hostId
+        && owner(room(request.resource.data.propertyId)) == uid()
+        && request.resource.data.tenantUid == room(request.resource.data.propertyId).get('tenantUid','') && request.resource.data.tenantUid != ''
+        && request.resource.data.keys().hasOnly(['propertyId','roomName','hostId','tenantUid','month','monthKey','roomFee','electricityFee','waterFee','totalAmount','status','createdAt'])
+        && request.resource.data.month.matches('^(0[1-9]|1[0-2])/20[0-9]{2}$')
+        && request.resource.data.monthKey == request.resource.data.month.split('/')[1] + '-' + request.resource.data.month.split('/')[0]
+        && billId == request.resource.data.propertyId + '~' + request.resource.data.tenantUid + '~' + request.resource.data.monthKey
+        && request.resource.data.roomFee is int && request.resource.data.roomFee >= 0 && request.resource.data.roomFee <= 1000000000000
+        && request.resource.data.electricityFee is int && request.resource.data.electricityFee >= 0 && request.resource.data.electricityFee <= 1000000000000
+        && request.resource.data.waterFee is int && request.resource.data.waterFee >= 0 && request.resource.data.waterFee <= 1000000000000
+        && request.resource.data.totalAmount == request.resource.data.roomFee + request.resource.data.electricityFee + request.resource.data.waterFee
+        && request.resource.data.totalAmount >= 0 && request.resource.data.totalAmount <= 1000000000000 && request.resource.data.status == 'Chưa thanh toán';
+      allow update: if signed() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','updatedAt'])
+        && ((uid() == resource.data.tenantUid && resource.data.status == 'Chưa thanh toán' && request.resource.data.status == 'Chờ xác nhận')
+          || (uid() == resource.data.hostId && resource.data.status == 'Chờ xác nhận' && request.resource.data.status == 'Đã thanh toán'));
+    }
+    match /conversations/{conversationId} {
+      function participant(d) { return signed() && uid() in d.participants; }
+      allow get: if signed() && (!exists(/databases/$(database)/documents/conversations/$(conversationId)) || participant(resource.data));
+      allow list: if participant(resource.data);
+      allow create: if participant(request.resource.data) && request.resource.data.participants.size() == 2
+        && request.resource.data.participants[0] != request.resource.data.participants[1]
+        && owner(room(request.resource.data.propertyId)) in request.resource.data.participants
+        && request.resource.data.createdBy == uid()
+        && request.resource.data.keys().hasOnly(['participants','propertyId','roomName','createdBy','lastText','lastTime']);
+      allow update: if participant(resource.data) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastText','lastTime'])
+        && request.resource.data.lastText is string && request.resource.data.lastText.size() <= 2000;
+      match /messages/{messageId} {
+        function member() { return participant(get(/databases/$(database)/documents/conversations/$(conversationId)).data); }
+        allow read: if member();
+        allow create: if member() && request.resource.data.senderId == uid()
+          && request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 2000
+          && request.resource.data.senderName is string && request.resource.data.senderName.size() <= 100
+          && request.resource.data.time is int && request.resource.data.keys().hasOnly(['senderId','senderName','text','time']);
+      }
+    }
+    match /comments/{commentId} {
+      allow read: if true;
+      allow create: if signed() && request.resource.data.userUid == uid()
+        && exists(/databases/$(database)/documents/properties/$(request.resource.data.propertyId))
+        && request.resource.data.content is string && request.resource.data.content.size() > 0 && request.resource.data.content.size() <= 2000
+        && request.resource.data.username is string && request.resource.data.username.size() <= 100
+        && request.resource.data.keys().hasOnly(['propertyId','userUid','username','content','createdAt']);
+    }
+    match /repairs/{repairId} {
+      allow read: if party(resource.data);
+      allow create: if signed() && request.resource.data.tenantUid == uid()
+        && room(request.resource.data.propertyId).get('tenantUid','') == uid()
+        && request.resource.data.hostId == owner(room(request.resource.data.propertyId))
+        && request.resource.data.status == 'Chờ xử lý' && request.resource.data.description is string
+        && request.resource.data.description.size() > 0 && request.resource.data.description.size() <= 2000
+        && request.resource.data.keys().hasOnly(['propertyId','propertyTitle','tenantUid','hostId','description','status','timestamp']);
+      allow update: if signed() && uid() == resource.data.hostId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status in ['Chờ xử lý','Đang sửa','Đã xong'];
+    }
+    match /assets/{assetId} {
+      allow read: if signed() && (resource.data.hostId == uid() || room(resource.data.propertyId).get('tenantUid','') == uid());
+      allow create, update: if signed() && request.resource.data.hostId == uid()
+        && owner(room(request.resource.data.propertyId)) == uid()
+        && (resource == null || resource.data.hostId == uid())
+        && request.resource.data.quantity is int && request.resource.data.quantity >= 0 && request.resource.data.quantity <= 1000
+        && request.resource.data.assetName is string && request.resource.data.assetName.size() > 0 && request.resource.data.assetName.size() <= 100
+        && request.resource.data.keys().hasOnly(['propertyId','hostId','roomName','assetName','quantity','condition']);
+      allow delete: if signed() && resource.data.hostId == uid();
+    }
+    match /news/{newsId} {
+      allow read: if true;
+      allow create: if signed() && request.resource.data.authorUid == uid()
+        && request.resource.data.keys().hasOnly(['authorUid','title','category','description','imageUrl','likes','comments','createdAt'])
+        && request.resource.data.title is string && request.resource.data.title.size() >= 3 && request.resource.data.title.size() <= 150
+        && request.resource.data.description is string && request.resource.data.description.size() <= 20000;
+      match /likes/{userId} { allow read: if signed() && uid() == userId; allow create, delete: if signed() && uid() == userId; }
+    }
+    match /news_comments/{commentId} {
+      allow read: if true;
+      allow create: if signed() && request.resource.data.userUid == uid()
+        && exists(/databases/$(database)/documents/news/$(request.resource.data.newsId))
+        && request.resource.data.content is string && request.resource.data.content.size() > 0 && request.resource.data.content.size() <= 2000
+        && request.resource.data.keys().hasOnly(['newsId','userUid','username','content','timestamp']);
+    }
+    match /notifications/{notificationId} { allow read: if signed() && resource.data.userUid == uid(); }
+  }
+}

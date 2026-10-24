@@ -13,8 +13,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 class ProfileActivity : HouseActivity() {
 
     private lateinit var binding: ActivityProfileBinding
-    private val auth = FirebaseAuth.getInstance()
-    private val db = FirebaseFirestore.getInstance()
+    private val auth = Backend.auth
+    private val db = Backend.db
     private val PICK_IMAGE_REQUEST = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,6 +29,18 @@ class ProfileActivity : HouseActivity() {
         binding.btnGuestLogin.visibility = if (signedIn) View.GONE else View.VISIBLE
         binding.btnLogout.visibility = if (signedIn) View.VISIBLE else View.GONE
         binding.btnGuestLogin.setOnClickListener { startActivity(Intent(this, LoginActivity::class.java)) }
+        com.google.android.material.button.MaterialButton(this).apply {
+            text="Phòng đã lưu";isAllCaps=false;binding.layoutSeekerMenu.addView(this)
+            setOnClickListener { if(requireAccount()) startActivity(Intent(this@ProfileActivity,PropertyActivity::class.java).putExtra("FAVORITES_ONLY",true)) }
+        }
+        com.google.android.material.button.MaterialButton(this).apply {
+            text="Yêu cầu thuê của tôi";isAllCaps=false;binding.layoutSeekerMenu.addView(this)
+            setOnClickListener { if(requireAccount()) startActivity(Intent(this@ProfileActivity,RentalRequestsActivity::class.java)) }
+        }
+        com.google.android.material.button.MaterialButton(this).apply {
+            text="Duyệt yêu cầu thuê";isAllCaps=false;binding.layoutHostMenu.addView(this)
+            setOnClickListener { if(requireAccount()) startActivity(Intent(this@ProfileActivity,RentalRequestsActivity::class.java).putExtra("HOST_MODE",true)) }
+        }
         loadUserData()
         setupBottomNavigation()
         setupRoleToggle()
@@ -41,6 +53,7 @@ class ProfileActivity : HouseActivity() {
 
         binding.btnLogout.setOnClickListener {
             auth.signOut()
+            getSharedPreferences("AppPrefs",MODE_PRIVATE).edit().remove("user_role").remove("role_uid").apply()
             val intent = Intent(this, LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
@@ -52,7 +65,7 @@ class ProfileActivity : HouseActivity() {
             startActivity(intent)
         }
         binding.btnMessages.setOnClickListener {
-            startActivity(Intent(this, if (auth.currentUser == null) LoginActivity::class.java else ChatActivity::class.java))
+            startActivity(Intent(this, if (auth.currentUser == null) LoginActivity::class.java else ConversationListActivity::class.java))
         }
         // Kết nối nút hỗ trợ với trang AI mới
         binding.btnSupport.setOnClickListener {
@@ -69,7 +82,7 @@ class ProfileActivity : HouseActivity() {
         }
         // Đọc lại role đã lưu để hiển thị đúng nút khi vừa vào trang
         val sharedPref = getSharedPreferences("AppPrefs", MODE_PRIVATE)
-        val role = sharedPref.getString("user_role", "seeker")
+        val role = sharedPref.getString("user_role", "seeker").takeIf { sharedPref.getString("role_uid",null)==auth.currentUser?.uid && auth.currentUser!=null } ?: "seeker"
 
         if (role == "host") {
             binding.toggleRoleGroup.check(R.id.btnHostMode)
@@ -90,6 +103,11 @@ class ProfileActivity : HouseActivity() {
             .addOnSuccessListener { doc ->
                 if (doc.exists()) {
                     binding.tvProfileName.text = doc.getString("fullName") ?: getString(R.string.profile_title)
+                    val host=doc.getString("role")=="host"
+                    binding.toggleRoleGroup.check(if(host) R.id.btnHostMode else R.id.btnSeekerMode)
+                    binding.layoutHostMenu.visibility=if(host) View.VISIBLE else View.GONE
+                    binding.layoutSeekerMenu.visibility=if(host) View.GONE else View.VISIBLE
+                    com.bumptech.glide.Glide.with(this).load(doc.getString("avatarUrl")).placeholder(R.drawable.ic_ui_person).error(R.drawable.ic_ui_person).into(binding.ivAvatar)
                 }
             }
     }
@@ -130,11 +148,24 @@ class ProfileActivity : HouseActivity() {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
             val imageUri: Uri? = data?.data
             if (imageUri != null) {
-                binding.ivAvatar.setPadding(0, 0, 0, 0)
-                binding.ivAvatar.setImageURI(imageUri)
-                Toast.makeText(this, "Đã cập nhật ảnh đại diện", Toast.LENGTH_SHORT).show()
+                binding.btnEditAvatar.isEnabled=false
+                ImageUpload.upload(this,imageUri).continueWithTask { upload ->
+                    db.collection("Users").document(auth.currentUser!!.uid).update(mapOf("avatarUrl" to upload.result,"password" to com.google.firebase.firestore.FieldValue.delete()))
+                }.addOnSuccessListener { loadUserData();notice("Đã lưu ảnh đại diện") }.addOnFailureListener(::failure)
+                    .addOnCompleteListener { binding.btnEditAvatar.isEnabled=true }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume();if(!::binding.isInitialized) return
+        val signed=auth.currentUser!=null
+        binding.toggleRoleGroup.visibility=if(signed) View.VISIBLE else View.GONE
+        binding.btnEditAvatar.visibility=if(signed) View.VISIBLE else View.GONE
+        binding.btnGuestLogin.visibility=if(signed) View.GONE else View.VISIBLE
+        binding.btnLogout.visibility=if(signed) View.VISIBLE else View.GONE
+        binding.tvProfileSubtitle.setText(if(signed) R.string.profile_description else R.string.profile_guest_description)
+        loadUserData()
     }
 
     private fun setupRoleToggle() {

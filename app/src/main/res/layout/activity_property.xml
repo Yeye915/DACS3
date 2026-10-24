@@ -52,6 +52,11 @@
             android:textSize="13sp"
             android:maxLines="2"
             android:ellipsize="end" />
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+            <com.google.android.material.button.MaterialButton android:id="@+id/btnMapRooms" style="@style/Widget.House.Button.Tonal" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="Bản đồ" android:minHeight="48dp" android:textSize="12sp" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/btnFilterRooms" style="@style/Widget.House.Button.Tonal" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginHorizontal="6dp" android:text="Bộ lọc" android:minHeight="48dp" android:textSize="12sp" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/btnSavedRooms" style="@style/Widget.House.Button.Tonal" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="♡ Đã lưu" android:minHeight="48dp" android:textSize="12sp" />
+        </LinearLayout>
     </LinearLayout>
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/searchCard"

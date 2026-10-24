@@ -2,125 +2,57 @@ package com.example.dacs3
 
 import android.os.Bundle
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dacs3.databinding.ActivityAddPropertyDetailBinding
-import com.google.firebase.firestore.FirebaseFirestore
 
 class PropertyHomeDetailActivity : HouseActivity() {
-
-    private lateinit var db: FirebaseFirestore
     private lateinit var binding: ActivityAddPropertyDetailBinding
-
-    // ĐỔI SANG dùng AssetItem để đồng bộ cấu trúc với Dashboard
-    private val assetList = mutableListOf<AssetItem>()
+    private val assets=mutableListOf<AssetItem>()
     private lateinit var adapter: AssetAdapter
-
+    private var property: Property?=null
+    private var loadedIds=emptySet<String>()
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityAddPropertyDetailBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        db = FirebaseFirestore.getInstance()
-
-        setupSpinner()
-        setupAssetList()
-
-        // Bắt sự kiện bấm nút lưu tổng thể
-        binding.btnSaveAll.setOnClickListener {
-            saveDataToFirestore()
-        }
-        // Xử lý thêm đồ dùng tùy chỉnh vào danh sách bên dưới
+        super.onCreate(savedInstanceState);binding=ActivityAddPropertyDetailBinding.inflate(layoutInflater);setContentView(binding.root)
+        if(!requireAccount()) { finish();return }
+        adapter=AssetAdapter(assets);binding.rvAssetList.layoutManager=LinearLayoutManager(this);binding.rvAssetList.adapter=adapter
+        binding.spinnerStatus.adapter=ArrayAdapter(this,android.R.layout.simple_spinner_dropdown_item,listOf("Trống","Đang bảo trì","Đã thuê"))
+        binding.edtRoomCode.isFocusable=false;binding.edtRoomCode.hint="Chạm để chọn phòng";binding.edtRoomCode.setOnClickListener { chooseProperty(true,false,::select) }
+        binding.btnSaveAll.isEnabled=false
+        val chosen=intent.getSerializableExtra("CHOSEN_PROPERTY") as? Property
+        if(chosen!=null) select(chosen) else chooseProperty(true,false,::select)
         binding.btnAddCustomAsset.setOnClickListener {
-            val customName = binding.edtCustomAssetName.text.toString().trim()
-            if (customName.isEmpty()) {
-                Toast.makeText(this, "Vui lòng gõ tên đồ dùng cần thêm!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            // Tạo object mới add vào list tài sản tạm thời
-            val newItem = AssetItem(
-                id = "",
-                assetName = customName,
-                roomName = binding.edtRoomCode.text.toString().trim(), // Gán luôn mã phòng hiện tại
-                quantity = 1,
-                condition = "Tốt"
-            )
-
-            assetList.add(newItem)
-
-            // Dùng lệnh này để cập nhật đồng bộ lại toàn bộ Adapter hiển thị lên màn hình hiện tại
-            adapter.notifyDataSetChanged()
-
-            binding.edtCustomAssetName.text.clear() // Xóa trống ô nhập chữ
+            val name=binding.edtCustomAssetName.text.toString().trim()
+            if(name.length !in 1..100 || assets.any { it.assetName.equals(name,true) } || assets.size>=50) { notice("Tên tài sản từ 1 đến 100 ký tự, không trùng; tối đa 50 loại mỗi phòng");return@setOnClickListener }
+            assets.add(AssetItem(assetName=name));adapter.notifyItemInserted(assets.lastIndex);binding.edtCustomAssetName.text.clear()
         }
+        binding.btnSaveAll.setOnClickListener { save() }
     }
-
-    private fun setupSpinner() {
-        val statuses = listOf("Trống", "Đã thuê", "Đang bảo trì")
-        val adapterSpinner = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, statuses)
-        binding.spinnerStatus.adapter = adapterSpinner
+    private fun select(room: Property) {
+        if(room.hostId!=Backend.auth.currentUser?.uid) { notice("Bạn không quản lý phòng này");return }
+        property=room;binding.edtRoomCode.setText(room.title);binding.edtPrice.setText(room.rent.toString());binding.edtMaxPeople.setText(room.maxPeople.toString())
+        binding.spinnerStatus.setSelection(when(room.status) { "Đang bảo trì"->1;"Đã thuê"->2;else->0 });binding.spinnerStatus.isEnabled=room.tenantUid.isBlank()
+        binding.btnSaveAll.isEnabled=false
+        Backend.db.collection("assets").whereEqualTo("propertyId",room.id).get().addOnSuccessListener { data ->
+            assets.clear();assets.addAll(data.documents.map { it.toObject(AssetItem::class.java)!!.copy(id=it.id) });loadedIds=data.documents.map { it.id }.toSet()
+            adapter.notifyDataSetChanged();binding.btnSaveAll.isEnabled=true
+        }.addOnFailureListener(::failure)
     }
-
-    private fun setupAssetList() {
-        // Danh sách các tên vật tư mặc định của Nhi
-        val defaultNames = listOf("Giường", "Tủ lạnh", "Máy lạnh", "Máy giặt", "Tủ quần áo", "Bàn ghế", "Quạt")
-
-        assetList.clear()
-        defaultNames.forEach { name ->
-            // Ánh xạ chuẩn đét theo Model AssetItem mới
-            assetList.add(AssetItem(
-                id = "",
-                assetName = name,
-                roomName = "", // Sẽ được cập nhật khi điền tên phòng
-                quantity = 1,
-                condition = "Tốt"
-            ))
+    private fun save() {
+        val room=property ?: return;val uid=Backend.auth.currentUser?.uid ?: return
+        val price=RentalValidation.money(binding.edtPrice.text.toString());val people=binding.edtMaxPeople.text.toString().toIntOrNull()
+        if(price==null || price<=0 || people==null || people !in 1..50 || assets.any { it.quantity !in 0..1000 }) { notice("Kiểm tra giá thuê, số người (1–50) và số lượng tài sản (0–1.000)");return }
+        val status=binding.spinnerStatus.selectedItem.toString()
+        if(room.tenantUid.isBlank() && status=="Đã thuê") { notice("Phòng chỉ được đánh dấu đã thuê qua quy trình chấp thuận yêu cầu thuê");return }
+        binding.btnSaveAll.isEnabled=false
+        val batch=Backend.db.batch()
+        val retained=assets.map { if(it.id.isNotBlank()) it.id else RentalValidation.id(room.id,it.assetName.lowercase(java.util.Locale.ROOT)) }.toSet()
+        (loadedIds-retained).forEach { batch.delete(Backend.db.collection("assets").document(it)) }
+        assets.forEach { item ->
+            val id=if(item.id.isNotBlank()) item.id else RentalValidation.id(room.id,item.assetName.lowercase(java.util.Locale.ROOT))
+            batch.set(Backend.db.collection("assets").document(id),mapOf("propertyId" to room.id,"hostId" to uid,"roomName" to room.title,"assetName" to item.assetName,"quantity" to item.quantity,"condition" to item.condition))
         }
-
-        // Nếu file AssetAdapter cũ của Nhi báo đỏ, hãy đổi kiểu dữ liệu nhận vào của Adapter thành List<AssetItem> nhé
-        adapter = AssetAdapter(assetList)
-        binding.rvAssetList.layoutManager = LinearLayoutManager(this)
-        binding.rvAssetList.adapter = adapter
-    }
-
-    private fun saveDataToFirestore() {
-        // 1. Lấy trạng thái phòng trọ từ Spinner
-        val roomStatus = binding.spinnerStatus.selectedItem.toString()
-
-        // 2. ĐỔI TỪ edtNote SANG edtRoomCode ĐỂ KHỚP VỚI XML CỦA NHI
-        val inputRoomName = binding.edtRoomCode.text.toString().trim()
-
-        // Kiểm tra nếu chủ nhà quên chưa nhập mã phòng
-        if (inputRoomName.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập Mã phòng (VD: P101) để quản lý tài sản!", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // 3. Khởi tạo tiến trình lưu đồng bộ (Batch Write) ghi dữ liệu lên Firebase
-        val batch = db.batch()
-
-        assetList.forEach { asset ->
-            // Tạo một document ID ngẫu nhiên mới trong collection "assets" để hiển thị lên Dashboard
-            val docRef = db.collection("assets").document()
-
-            val assetData = hashMapOf(
-                "assetName" to asset.assetName,  // Phải là "assetName", không được viết là "name" hay "AssetName"
-                "roomName" to inputRoomName,    // Phải là "roomName"
-                "quantity" to asset.quantity,    // Phải là "quantity"
-                "condition" to asset.condition   // Phải là "condition"
-            )
-            batch.set(docRef, assetData)
-        }
-
-        // Thực thi lệnh gửi dữ liệu lên Firebase
-        batch.commit()
-            .addOnSuccessListener {
-                Toast.makeText(this, "Đã đồng bộ dữ liệu vào kho tài sản tổng!", Toast.LENGTH_SHORT).show()
-                finish() // Đóng màn hình quay về Dashboard tài sản
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Lỗi kết nối Firebase: ${e.message}", Toast.LENGTH_LONG).show()
-            }
+        // Room edits preserve tenant identity and never end a rental through a status spinner.
+        batch.update(Backend.db.collection("properties").document(room.id),mapOf("monthlyPrice" to price,"price" to "${RentalValidation.format(price)}/tháng","maxPeople" to people,"status" to if(room.tenantUid.isNotBlank()) room.status else status))
+        batch.commit().addOnSuccessListener { notice("Đã lưu tài sản của phòng");finish() }.addOnFailureListener(::failure).addOnCompleteListener { binding.btnSaveAll.isEnabled=true }
     }
 }

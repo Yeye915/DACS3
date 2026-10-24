@@ -2,100 +2,45 @@ package com.example.dacs3
 
 import android.os.Bundle
 import android.util.Patterns
-import android.widget.Toast
 import com.example.dacs3.databinding.ActivityRegisterBinding
-import com.google.firebase.auth.FirebaseAuth // 1. Import thư viện Firebase Auth
+import com.google.firebase.auth.UserProfileChangeRequest
 
 class RegisterActivity : HouseActivity() {
     private lateinit var binding: ActivityRegisterBinding
-    private lateinit var auth: FirebaseAuth // 2. Khai báo biến Firebase Auth
-
+    private var pendingUid: String?=null
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityRegisterBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        // 3. Khởi tạo đối tượng Firebase Auth
-        auth = FirebaseAuth.getInstance()
-
-        binding.btnRegisterSubmit.setOnClickListener {
-            performRegistration()
-        }
-
-        binding.tvBackToLogin.setOnClickListener {
-            finish()
-        }
+        super.onCreate(savedInstanceState);binding=ActivityRegisterBinding.inflate(layoutInflater);setContentView(binding.root)
+        pendingUid=savedInstanceState?.getString("pendingUid")
+        binding.btnRegisterSubmit.setOnClickListener { register() }
+        binding.tvBackToLogin.setOnClickListener { finish() }
     }
-
-    private fun performRegistration() {
-        val name = binding.etFullName.text.toString().trim()
-        val email = binding.etEmail.text.toString().trim()
-        val phone = binding.etPhone.text.toString().trim()
-        val pass = binding.etPassReg.text.toString().trim()
-        val confirmPass = binding.etConfirmPass.text.toString().trim()
-
-        // Lấy vai trò được chọn từ RadioGroup (Mới thêm)
-        val selectedRole = if (binding.rbHost.isChecked) {
-            "host"   // Chủ nhà
-        } else {
-            "seeker" // Người tìm phòng / Người thuê
-        }
-
-        // Kiểm tra điều kiện bỏ trống
-        if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || pass.isEmpty() || confirmPass.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // Kiểm tra định dạng Email
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            binding.etEmail.error = "Email không đúng định dạng"
-            return
-        }
-
-        // Kiểm tra mật khẩu
-        if (pass != confirmPass) {
-            binding.etConfirmPass.error = "Mật khẩu xác nhận không khớp"
-            return
-        }
-
-        if (pass.length < 6) {
-            binding.etPassReg.error = "Mật khẩu phải từ 6 ký tự trở lên"
-            return
-        }
-
-        // --- TIẾN HÀNH ĐĂNG KÝ VỚI FIREBASE ---
-        Toast.makeText(this, "Đang xử lý đăng ký...", Toast.LENGTH_SHORT).show()
-
-        auth.createUserWithEmailAndPassword(email, pass)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    val userId = auth.currentUser?.uid
-                    val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
-
-                    // Đưa giá trị selectedRole vào Map để lưu lên Firestore
-                    val userMap = hashMapOf(
-                        "fullName" to name,
-                        "email" to email,
-                        "phone" to phone,
-                        "role" to selectedRole // Thay vì để mặc định "User", ta lưu role thật
-                    )
-
-                    // Lưu vào Collection "Users"
-                    if (userId != null) {
-                        db.collection("Users").document(userId)
-                            .set(userMap)
-                            .addOnSuccessListener {
-                                Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show()
-                                finish()
-                            }
-                            .addOnFailureListener { e ->
-                                Toast.makeText(this, "Lỗi lưu dữ liệu: ${e.message}", Toast.LENGTH_SHORT).show()
-                            }
-                    }
-                } else {
-                    Toast.makeText(this, "Lỗi: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                }
+    private fun register() {
+        val name=binding.etFullName.text.toString().trim();val email=binding.etEmail.text.toString().trim();val phone=binding.etPhone.text.toString().trim()
+        val password=binding.etPassReg.text.toString();val confirm=binding.etConfirmPass.text.toString()
+        val role=if(binding.rbHost.isChecked) "host" else "seeker"
+        if(name.length !in 2..100 || phone.length !in 8..20) { notice("Nhập họ tên từ 2 đến 100 ký tự và số điện thoại hợp lệ");return }
+        if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()) { binding.etEmail.error="Email không hợp lệ";return }
+        if(password.length<6) { binding.etPassReg.error="Mật khẩu tối thiểu 6 ký tự";return }
+        if(password!=confirm) { binding.etConfirmPass.error="Mật khẩu xác nhận không khớp";return }
+        binding.btnRegisterSubmit.isEnabled=false
+        fun profile(uid: String) {
+            val ref=Backend.db.collection("Users").document(uid)
+            Backend.db.runTransaction { tx ->
+                require(!tx.get(ref).exists()) { "Tài khoản đã có hồ sơ. Hãy đăng nhập." }
+                tx.set(ref,mapOf("fullName" to name,"email" to email,"phone" to phone,"role" to role));null
+            }.addOnSuccessListener {
+                Backend.auth.currentUser?.updateProfile(UserProfileChangeRequest.Builder().setDisplayName(name).build())
+                getSharedPreferences("AppPrefs",MODE_PRIVATE).edit().putString("user_role",role).putString("role_uid",uid).apply()
+                notice("Đăng ký thành công");setResult(RESULT_OK);finish()
+            }.addOnFailureListener {
+                binding.btnRegisterSubmit.isEnabled=true;binding.btnRegisterSubmit.text="Hoàn tất hồ sơ"
+                notice("Tài khoản đã được tạo nhưng chưa lưu được hồ sơ. Giữ màn hình này và nhấn Hoàn tất hồ sơ để thử lại.")
             }
+        }
+        if(pendingUid!=null && Backend.auth.currentUser?.uid==pendingUid && Backend.auth.currentUser?.email==email) { profile(pendingUid!!);return }
+        Backend.auth.createUserWithEmailAndPassword(email,password).addOnSuccessListener {
+            pendingUid=it.user!!.uid;profile(pendingUid!!)
+        }.addOnFailureListener { binding.btnRegisterSubmit.isEnabled=true;notice("Không thể đăng ký. Email có thể đã được sử dụng; kiểm tra kết nối hoặc đăng nhập.") }
     }
+    override fun onSaveInstanceState(out: Bundle) { out.putString("pendingUid",pendingUid);super.onSaveInstanceState(out) }
 }

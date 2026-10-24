@@ -1,116 +1,48 @@
 package com.example.dacs3
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.widget.Toast
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.core.widget.doOnTextChanged
 import com.example.dacs3.databinding.ActivityAddBillBinding
-import com.google.firebase.firestore.FirebaseFirestore
-import java.text.DecimalFormat
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 
 class AddBillActivity : HouseActivity() {
-
     private lateinit var binding: ActivityAddBillBinding
-    private val firestore = FirebaseFirestore.getInstance()
-    private val formatter = DecimalFormat("#,###")
-
-    // Đối tượng nhận dữ liệu phòng trọ được truyền từ Adapter sang
-    private var currentProperty: Property? = null
-
+    private var room: Property?=null
+    private lateinit var total: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityAddBillBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        // 1. Nhận dữ liệu phòng trọ từ PropertyAdapter truyền sang
-        currentProperty = intent.getSerializableExtra("CHOSEN_PROPERTY") as? Property
-
-        // 2. Tự động điền dữ liệu vào đúng ID XML của Nhi
-        currentProperty?.let { property ->
-            binding.edtBillRoomName.setText(property.title)
-            binding.edtBillAddress.setText(property.rental) // Hoặc property.location tùy thuộc Model của bạn
-
-            // Làm sạch chuỗi tiền gốc trước khi đưa vào ô nhập
-            val cleanPrice = property.price.replace(",", "").replace(".", "").replace("đ", "").trim()
-            binding.edtBillRoomPrice.setText(cleanPrice)
-        } ?: run {
-            Toast.makeText(this, "Không tìm thấy dữ liệu nhà phòng trọ!", Toast.LENGTH_SHORT).show()
-            finish()
-            return
-        }
-
-        setupAutoCalculate()
-
-        // 3. Đúng ID nút bấm btnSubmitBill trong XML của bạn
+        super.onCreate(savedInstanceState);binding=ActivityAddBillBinding.inflate(layoutInflater);setContentView(binding.root)
+        if(!requireAccount()) { finish();return }
+        total=TextView(this).apply { textSize=20f;setPadding(0,24,0,16) }
+        val form=binding.btnSubmitBill.parent as LinearLayout;form.addView(total,form.indexOfChild(binding.btnSubmitBill))
+        binding.edtBillRoomName.isEnabled=true;binding.edtBillRoomName.isFocusable=false;binding.edtBillAddress.isFocusable=false
+        binding.edtBillMonth.setText(YearMonth.now().format(DateTimeFormatter.ofPattern("MM/yyyy")))
+        binding.edtBillElectricity.setText("0");binding.edtBillWater.setText("0")
+        listOf(binding.edtBillRoomPrice,binding.edtBillElectricity,binding.edtBillWater).forEach { it.doOnTextChanged { _,_,_,_ -> updateTotal() } }
+        binding.btnSubmitBill.isEnabled=false
+        val chosen=intent.getSerializableExtra("CHOSEN_PROPERTY") as? Property
+        if(chosen!=null) select(chosen) else chooseProperty(true,true,::select)
+        binding.edtBillRoomName.setOnClickListener { chooseProperty(true,true,::select) }
         binding.btnSubmitBill.setOnClickListener {
-            saveBillToFirestore()
+            val p=room ?: return@setOnClickListener
+            val month=RentalValidation.month(binding.edtBillMonth.text.toString())
+            val amounts=listOf(binding.edtBillRoomPrice,binding.edtBillElectricity,binding.edtBillWater).map { RentalValidation.money(it.text.toString()) }
+            if(month==null) { binding.edtBillMonth.error="Tháng theo dạng MM/YYYY";return@setOnClickListener }
+            if(amounts.any { it==null } || RentalValidation.total(*amounts.filterNotNull().toLongArray())==null) { notice("Nhập số tiền hợp lệ, không để trống");return@setOnClickListener }
+            binding.btnSubmitBill.isEnabled=false
+            RentalStore.createBill(p.id,month,amounts[0]!!,amounts[1]!!,amounts[2]!!)
+                .addOnSuccessListener { notice("Đã tạo hóa đơn $month");finish() }.addOnFailureListener(::failure)
+                .addOnCompleteListener { binding.btnSubmitBill.isEnabled=true }
         }
     }
-
-    private fun setupAutoCalculate() {
-        val watcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                calculateTotal()
-            }
-            override fun afterTextChanged(s: Editable?) {}
-        }
-
-        // Lắng nghe sự thay đổi để tính toán tổng tiền động
-        binding.edtBillRoomPrice.addTextChangedListener(watcher)
-        binding.edtBillElectricity.addTextChangedListener(watcher)
-        binding.edtBillWater.addTextChangedListener(watcher)
+    private fun select(p: Property) {
+        if(p.hostId!=Backend.auth.currentUser?.uid || p.tenantUid.isBlank()) { notice("Chọn phòng của bạn đang có người thuê");return }
+        room=p;binding.edtBillRoomName.setText(p.title);binding.edtBillAddress.setText(p.address);binding.edtBillRoomPrice.setText(p.rent.toString());binding.btnSubmitBill.isEnabled=true
     }
-
-    private fun calculateTotal(): Long {
-        val roomPrice = binding.edtBillRoomPrice.text.toString().toLongOrNull() ?: 0L
-        val elecBill = binding.edtBillElectricity.text.toString().toLongOrNull() ?: 0L
-        val waterBill = binding.edtBillWater.text.toString().toLongOrNull() ?: 0L
-
-        return roomPrice + elecBill + waterBill
-    }
-
-    private fun saveBillToFirestore() {
-        val property = currentProperty ?: return
-        val roomName = binding.edtBillRoomName.text.toString().trim()
-        val month = binding.edtBillMonth.text.toString().trim()
-
-        if (roomName.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập tên phòng", Toast.LENGTH_SHORT).show()
-            return
-        }
-        if (month.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập tháng xuất hóa đơn", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val roomFee = binding.edtBillRoomPrice.text.toString().toLongOrNull() ?: 0L
-        val electricityFee = binding.edtBillElectricity.text.toString().toLongOrNull() ?: 0L
-        val waterFee = binding.edtBillWater.text.toString().toLongOrNull() ?: 0L
-
-        // Đóng gói dữ liệu chuẩn chỉnh gửi lên tập hợp "bills"
-        val billData = hashMapOf(
-            "roomName" to roomName,
-            "month" to month,
-            "roomFee" to roomFee,
-            "electricityFee" to electricityFee,
-            "waterFee" to waterFee,
-            "totalAmount" to calculateTotal(),
-            "date" to System.currentTimeMillis(),
-            "status" to "Chưa thanh toán",
-
-            // Các trường liên kết ID cốt lõi
-            "hostId" to property.hostId,
-            "tenantUid" to property.tenantUid
-        )
-
-        firestore.collection("bills").add(billData)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Đã xuất hóa đơn thành công!", Toast.LENGTH_SHORT).show()
-                finish()
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Lỗi khi lưu hóa đơn", Toast.LENGTH_SHORT).show()
-            }
+    private fun updateTotal() {
+        val amounts=listOf(binding.edtBillRoomPrice,binding.edtBillElectricity,binding.edtBillWater).map { RentalValidation.money(it.text.toString()) }
+        total.text=if(amounts.any { it==null }) "Tổng: —" else "Tổng: ${RentalValidation.total(*amounts.filterNotNull().toLongArray())?.let(RentalValidation::format) ?: "Vượt giới hạn"}"
     }
 }

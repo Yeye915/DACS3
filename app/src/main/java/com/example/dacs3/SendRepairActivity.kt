@@ -1,52 +1,27 @@
 package com.example.dacs3
 
+import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import com.example.dacs3.databinding.ActivitySendRepairBinding
-import com.google.firebase.firestore.FirebaseFirestore
-
+import com.google.android.material.button.MaterialButton
 class SendRepairActivity : HouseActivity() {
-
     private lateinit var binding: ActivitySendRepairBinding
-    private val db = FirebaseFirestore.getInstance()
-
+    private var room: Property?=null
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivitySendRepairBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        // Nút quay lại
-        binding.btnBack.setOnClickListener { finish() }
-
-        // Sự kiện gửi báo cáo sự cố
+        super.onCreate(savedInstanceState);binding=ActivitySendRepairBinding.inflate(layoutInflater);setContentView(binding.root)
+        if(!requireAccount()) { finish();return }
+        binding.btnBack.setOnClickListener { finish() };binding.edtRepairRoom.isFocusable=false;binding.edtRepairRoom.hint="Chạm để chọn phòng đang thuê"
+        fun select() { chooseProperty(false,false) { room=it;binding.edtRepairRoom.setText(it.title) } }
+        binding.edtRepairRoom.setOnClickListener { select() };select()
+        MaterialButton(this).apply { text="Theo dõi yêu cầu sửa chữa";(binding.btnSubmitRepair.parent as android.widget.LinearLayout).addView(this)
+            setOnClickListener { startActivity(Intent(this@SendRepairActivity,RepairManagementActivity::class.java).putExtra("HOST_MODE",false)) } }
         binding.btnSubmitRepair.setOnClickListener {
-            val roomName = binding.edtRepairRoom.text.toString().trim()
-            val description = binding.edtRepairDescription.text.toString().trim()
-
-            if (roomName.isEmpty() || description.isEmpty()) {
-                Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin sự cố!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            // Đóng gói dữ liệu dạng Map đẩy lên collection "repairs" trùng khớp cấu trúc của Chủ nhà
-            val repairData = hashMapOf(
-                "propertyTitle" to roomName,
-                "description" to description,
-                "status" to "Chờ xử lý",
-                "timestamp" to System.currentTimeMillis()
-            )
-
-            binding.btnSubmitRepair.isEnabled = false // Khóa nút tránh gửi trùng lặp
-
-            db.collection("repairs").add(repairData)
-                .addOnSuccessListener {
-                    Toast.makeText(this, "Đã gửi báo cáo thành công! Chủ nhà sẽ xử lý sớm.", Toast.LENGTH_LONG).show()
-                    finish() // Đóng màn hình quay về trang chủ
-                }
-                .addOnFailureListener { e ->
-                    binding.btnSubmitRepair.isEnabled = true
-                    Toast.makeText(this, "Lỗi khi gửi báo cáo: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
+            val chosen=room;val text=binding.edtRepairDescription.text.toString().trim()
+            if(chosen==null) { notice("Hãy chọn phòng đang thuê");return@setOnClickListener }
+            if(text.length !in 1..2000) { binding.edtRepairDescription.error="Mô tả từ 1 đến 2.000 ký tự";return@setOnClickListener }
+            binding.btnSubmitRepair.isEnabled=false
+            Backend.db.collection("repairs").add(mapOf("propertyId" to chosen.id,"propertyTitle" to chosen.title,"hostId" to chosen.hostId,"tenantUid" to Backend.auth.currentUser!!.uid,"description" to text,"status" to "Chờ xử lý","timestamp" to System.currentTimeMillis()))
+                .addOnSuccessListener { notice("Đã gửi báo cáo sự cố");finish() }.addOnFailureListener(::failure).addOnCompleteListener { binding.btnSubmitRepair.isEnabled=true }
         }
     }
 }

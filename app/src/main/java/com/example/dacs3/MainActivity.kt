@@ -22,8 +22,8 @@ class MainActivity : HouseActivity() {
         setContentView(binding.root)
 
         // Khởi tạo Firebase
-        auth = FirebaseAuth.getInstance()
-        db = FirebaseFirestore.getInstance()
+        auth = Backend.auth
+        db = Backend.db
 
         // 2. Xử lý logic điều hướng Top Bar và Bottom Nav
         setupNavigationAndClicks()
@@ -32,66 +32,29 @@ class MainActivity : HouseActivity() {
     override fun onStart() {
         super.onStart()
         val cachedRole = getSharedPreferences("AppPrefs", MODE_PRIVATE)
-            .getString("user_role", "seeker") ?: "seeker"
+            .getString("user_role", "seeker")?.takeIf { getSharedPreferences("AppPrefs",MODE_PRIVATE).getString("role_uid",null)==auth.currentUser?.uid && auth.currentUser!=null } ?: "seeker"
         setupFeaturesLayout(cachedRole)
         fetchUserRoleAndSetupFeatures()
     }
 
+    private val statsListeners=mutableListOf<com.google.firebase.firestore.ListenerRegistration>()
     private fun updateStatistics(role: String) {
-        if (!::binding.isInitialized || binding.cardStatistics == null) return
-        val currentUserUid = auth.currentUser?.uid
-
-        if (role == "host") {
-            binding.txtStatLabel1.text = "Đã thuê"
-            binding.txtStatLabel2.text = "Chưa thuê"
-
-            if (currentUserUid != null) {
-                // Đếm số phòng ĐÃ THUÊ của chính chủ nhà này
-                db.collection("properties")
-                    .whereEqualTo("hostUid", currentUserUid)
-                    .whereEqualTo("status", "Đã thuê")
-                    .addSnapshotListener(this) { snapshots, _ ->
-                        binding.txtStatValue1.text = (snapshots?.size() ?: 0).toString()
-                    }
-
-                // Đếm số phòng TRỐNG của chính chủ nhà này
-                db.collection("properties")
-                    .whereEqualTo("hostUid", currentUserUid)
-                    .whereEqualTo("status", "Trống")
-                    .addSnapshotListener(this) { snapshots, _ ->
-                        binding.txtStatValue2.text = (snapshots?.size() ?: 0).toString()
-                    }
+        statsListeners.forEach { it.remove() };statsListeners.clear()
+        binding.txtStatLabel1.text=if(role=="host") "Đã thuê" else "Phòng trống"
+        binding.txtStatLabel2.text=if(role=="host") "Chưa thuê" else "Có trên bản đồ"
+        statsListeners.add(db.collection("properties").addSnapshotListener { data,_ ->
+            val rooms=data?.documents?.map(Property::from).orEmpty()
+            if(role=="host") {
+                val owned=rooms.filter { it.hostId==auth.currentUser?.uid }
+                binding.txtStatValue1.text=owned.count { it.tenantUid.isNotBlank() }.toString()
+                binding.txtStatValue2.text=owned.count { it.status=="Trống" && it.tenantUid.isBlank() }.toString()
+            } else {
+                binding.txtStatValue1.text=rooms.count { it.status=="Trống" && it.tenantUid.isBlank() }.toString()
+                binding.txtStatValue2.text=rooms.count { it.hasCoordinates }.toString()
             }
-        } else {
-            // VAI TRÒ NGƯỜI THUÊ
-            binding.txtStatLabel1.text = "Phòng trống"
-            binding.txtStatLabel2.text = "Khu vực"
-
-            // Đếm tổng số phòng trống trên toàn bộ hệ thống
-            db.collection("properties")
-                .whereEqualTo("status", "Trống")
-                .addSnapshotListener(this) { snapshots, _ ->
-                    binding.txtStatValue1.text = (snapshots?.size() ?: 0).toString()
-                }
-
-            // GIẢI PHÁP AN TOÀN: Lấy toàn bộ phòng về và đếm xem có bao nhiêu phòng ở Đà Nẵng
-            db.collection("properties")
-                .addSnapshotListener(this) { snapshots, _ ->
-                    var danangCount = 0
-                    if (snapshots != null) {
-                        for (doc in snapshots) {
-                            val rentalAddress = doc.getString("rental") ?: ""
-                            val cityField = doc.getString("city") ?: ""
-                            // Nếu địa chỉ chứa chữ "Lê Độ" hoặc "Đà Nẵng" thì tự động tính vào khu vực Đà Nẵng
-                            if (cityField == "Đà Nẵng" || rentalAddress.lowercase().contains("lê độ")) {
-                                danangCount++
-                            }
-                        }
-                    }
-                    binding.txtStatValue2.text = "Đà Nẵng ($danangCount)"
-                }
-        }
+        })
     }
+    override fun onStop() { statsListeners.forEach { it.remove() };statsListeners.clear();super.onStop() }
 
     private fun setupNavigationAndClicks() {
         binding.btnExploreRooms.setOnClickListener {
@@ -152,14 +115,14 @@ class MainActivity : HouseActivity() {
                         binding.tvUserNameTop.text = " $userName"
 
                         val role = document.getString("role") ?: "seeker"
-                        sharedPref.edit().putString("user_role", role).apply()
+                        sharedPref.edit().putString("user_role", role).putString("role_uid",currentUser.uid).apply()
 
                         setupFeaturesLayout(role)
                         updateStatistics(role)
                     }
                 }
                 .addOnFailureListener {
-                    val localRole = sharedPref.getString("user_role", "seeker") ?: "seeker"
+                    val localRole = sharedPref.getString("user_role", "seeker")?.takeIf { getSharedPreferences("AppPrefs",MODE_PRIVATE).getString("role_uid",null)==auth.currentUser?.uid && auth.currentUser!=null } ?: "seeker"
                     setupFeaturesLayout(localRole)
                     updateStatistics(localRole)
                 }
@@ -172,7 +135,7 @@ class MainActivity : HouseActivity() {
             binding.tvTopRegister.visibility = if (compactHeader) View.GONE else View.VISIBLE
             binding.tvUserNameTop.visibility = View.GONE
 
-            val localRole = sharedPref.getString("user_role", "seeker") ?: "seeker"
+            val localRole = sharedPref.getString("user_role", "seeker")?.takeIf { getSharedPreferences("AppPrefs",MODE_PRIVATE).getString("role_uid",null)==auth.currentUser?.uid && auth.currentUser!=null } ?: "seeker"
             setupFeaturesLayout(localRole)
             updateStatistics(localRole)
         }
@@ -185,7 +148,8 @@ class MainActivity : HouseActivity() {
                 Feature(2, "Quản lý tài sản", R.drawable.ic_ui_assets),
                 Feature(3, "Danh sách phòng", R.drawable.ic_ui_home),
                 Feature(4, "Yêu cầu sửa chữa", R.drawable.ic_ui_repair),
-                Feature(5, "Bàn giao phòng", R.drawable.ic_ui_key)
+                Feature(5, "Bàn giao phòng", R.drawable.ic_ui_key),
+                Feature(6, "Duyệt yêu cầu thuê", R.drawable.ic_ui_person)
             )
         } else {
             listOf(
@@ -193,7 +157,8 @@ class MainActivity : HouseActivity() {
                 Feature(2, "Phòng đang thuê", R.drawable.ic_ui_home),
                 Feature(3, "Khám phá phòng", R.drawable.ic_ui_explore),
                 Feature(4, "Báo cáo sự cố", R.drawable.ic_ui_repair),
-                Feature(5, "Nhận bàn giao", R.drawable.ic_ui_key)
+                Feature(5, "Nhận bàn giao", R.drawable.ic_ui_key),
+                Feature(6, "Yêu cầu thuê của tôi", R.drawable.ic_ui_person)
             )
         }
         renderRecyclerView(features, role)
@@ -201,6 +166,7 @@ class MainActivity : HouseActivity() {
 
     private fun renderRecyclerView(features: List<Feature>, role: String) {
         val adapter = FeatureAdapter(features) { selectedFeature ->
+            if(selectedFeature.id != 3 && !requireAccount()) return@FeatureAdapter
             when (selectedFeature.id) {
                 1 -> {
                     if (role == "host") {
@@ -239,6 +205,7 @@ class MainActivity : HouseActivity() {
                         startActivity(Intent(this, TenantHandoverActivity::class.java))
                     }
                 }
+                6 -> startActivity(Intent(this,RentalRequestsActivity::class.java).putExtra("HOST_MODE",role=="host"))
                 else -> {
                     Toast.makeText(this, "Tính năng: ${selectedFeature.title}", Toast.LENGTH_SHORT).show()
                 }
